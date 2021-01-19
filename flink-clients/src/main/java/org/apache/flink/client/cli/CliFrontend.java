@@ -1189,13 +1189,22 @@ public class CliFrontend {
         config.setInteger(RestOptions.PORT, address.getPort());
     }
 
+    /**
+     * 添加自定义命令行
+     * @param configuration 配置项
+     * @param configurationDirectory 配置文件目录
+     * @return
+     */
     public static List<CustomCommandLine> loadCustomCommandLines(
             Configuration configuration, String configurationDirectory) {
+        // 1. 初始化命令行窗口
         List<CustomCommandLine> customCommandLines = new ArrayList<>();
+        // 2. 添加Application Mode模式命令行
         customCommandLines.add(new GenericCLI(configuration, configurationDirectory));
 
         //	Command line interface of the YARN session, with a special initialization here
         //	to prefix all options with y/yarn.
+        // 3. YARN会话的命令行接口，所有选项参数都是以y/yarn前缀。
         final String flinkYarnSessionCLI = "org.apache.flink.yarn.cli.FlinkYarnSessionCli";
         try {
             customCommandLines.add(
@@ -1206,6 +1215,7 @@ public class CliFrontend {
                             "y",
                             "yarn"));
         } catch (NoClassDefFoundError | Exception e) {
+            // 4. 加载实现了FallbackYarnSessionCli的自定义命令行
             final String errorYarnSessionCLI = "org.apache.flink.yarn.cli.FallbackYarnSessionCli";
             try {
                 LOG.info("Loading FallbackYarnSessionCli");
@@ -1218,6 +1228,7 @@ public class CliFrontend {
         //	Tips: DefaultCLI must be added at last, because getActiveCustomCommandLine(..) will get
         // the
         //	      active CustomCommandLine in order and DefaultCLI isActive always return true.
+        // 5. 加载standalone部署模式下自定义命令行
         customCommandLines.add(new DefaultCLI());
 
         return customCommandLines;
@@ -1246,14 +1257,15 @@ public class CliFrontend {
     }
 
     /**
+     * 通过反射构造命令行
      * Loads a class from the classpath that implements the CustomCommandLine interface.
      *
-     * @param className The fully-qualified class name to load.
-     * @param params The constructor parameters
+     * @param className The fully-qualified class name to load. 要加载的命令行类的类名
+     * @param params The constructor parameters 命令行类的构造参数
      */
     private static CustomCommandLine loadCustomCommandLine(String className, Object... params)
             throws Exception {
-
+        // 加载CustomCommandLine接口实现类
         Class<? extends CustomCommandLine> customCliClass =
                 Class.forName(className).asSubclass(CustomCommandLine.class);
 
@@ -1263,9 +1275,9 @@ public class CliFrontend {
             checkNotNull(params[i], "Parameters for custom command-lines may not be null.");
             types[i] = params[i].getClass();
         }
-
+        // 获取命令行类的构造器
         Constructor<? extends CustomCommandLine> constructor = customCliClass.getConstructor(types);
-
+        // 通过构造器实例化类对象
         return constructor.newInstance(params);
     }
 }

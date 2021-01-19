@@ -192,28 +192,34 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
         this.acceptInteractiveInput = acceptInteractiveInput;
 
         // Create the command line options
-
+        // Yarn模式下命令行的参数options
+        // 查询资源的Option
         query =
                 new Option(
                         shortPrefix + "q",
                         longPrefix + "query",
                         false,
                         "Display available YARN resources (memory, cores)");
+        // 指定队列Option
         queue = new Option(shortPrefix + "qu", longPrefix + "queue", true, "Specify YARN queue.");
+        // 上传指定目录下的文件
         shipPath =
                 new Option(
                         shortPrefix + "t",
                         longPrefix + "ship",
                         true,
                         "Ship files in the specified directory (t for transfer)");
+        // flink依赖的jar包
         flinkJar =
                 new Option(shortPrefix + "j", longPrefix + "jar", true, "Path to Flink jar file");
+        // JobManager内存
         jmMemory =
                 new Option(
                         shortPrefix + "jm",
                         longPrefix + "jobManagerMemory",
                         true,
                         "Memory for JobManager Container with optional unit (default: MB)");
+        // TaskManager内存
         tmMemory =
                 new Option(
                         shortPrefix + "tm",
@@ -283,6 +289,8 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
         allOptions.addOption(help);
 
         // try loading a potential yarn properties file
+        // 尝试加载一个yarn的配置文件(yarn.properties-file.location),当作业提交到yarn后，
+        // JobManger的主机地址和可用的slot信息会写入这一个文件,这样Flink客户机就能够获取这些详细信息
         this.yarnPropertiesFileLocation =
                 configuration.getString(YarnConfigOptions.PROPERTIES_FILE_LOCATION);
         final File yarnPropertiesLocation = getYarnPropertiesLocation(yarnPropertiesFileLocation);
@@ -305,7 +313,7 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
                                 + '.',
                         ioe);
             }
-
+            //从配置文件中获取YarnApplicationID字符串
             final String yarnApplicationIdString =
                     yarnPropertiesFile.getProperty(YARN_APPLICATION_ID_KEY);
 
@@ -318,6 +326,7 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
 
             try {
                 // try converting id to ApplicationId
+                // 从YarnApplicationID字符串信息中获取ApplicationId
                 yarnApplicationIdFromYarnProperties =
                         ConverterUtils.toApplicationId(yarnApplicationIdString);
             } catch (Exception e) {
