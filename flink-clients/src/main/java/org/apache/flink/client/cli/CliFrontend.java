@@ -168,18 +168,19 @@ public class CliFrontend {
 
     protected void runApplication(String[] args) throws Exception {
         LOG.info("Running 'run-application' command.");
-
+        // 1. 获取run命令的一些运行命令参数Option 如-s ,-n(allowNonRestoredState), --jarFile , --class , -h 等
         final Options commandOptions = CliFrontendParser.getRunCommandOptions();
+        // 2. 通过commandOptions和args构建CommandLine
         final CommandLine commandLine = getCommandLine(commandOptions, args, true);
-
+        // 3. 如果是-h 直接打印run命令的帮助信息
         if (commandLine.hasOption(HELP_OPTION.getOpt())) {
             CliFrontendParser.printHelpForRunApplication(customCommandLines);
             return;
         }
-
+        // 4. 通过commandLine从customCommandLines命令容器中获取对应的CustomCommandLine(前面四种CustomCommandLine中的一种)
         final CustomCommandLine activeCommandLine =
                 validateAndGetActiveCommandLine(checkNotNull(commandLine));
-
+        // 5. 获取ApplicationDeployer部署对象
         final ApplicationDeployer deployer =
                 new ApplicationClusterDeployer(clusterClientServiceLoader);
 
@@ -187,7 +188,9 @@ public class CliFrontend {
         final Configuration effectiveConfiguration;
 
         // No need to set a jarFile path for Pyflink job.
+        // 生成effectiveConfiguration配置 
         if (ProgramOptionsUtils.isPythonEntryPoint(commandLine)) {
+            // pyFlink任务 
             programOptions = ProgramOptionsUtils.createPythonProgramOptions(commandLine);
             effectiveConfiguration =
                     getEffectiveConfiguration(
@@ -198,6 +201,7 @@ public class CliFrontend {
         } else {
             programOptions = new ProgramOptions(commandLine);
             programOptions.validate();
+            // 7. 获取jar包的URI
             final URI uri = PackagedProgramUtils.resolveURI(programOptions.getJarFilePath());
             effectiveConfiguration =
                     getEffectiveConfiguration(
@@ -206,10 +210,11 @@ public class CliFrontend {
                             programOptions,
                             Collections.singletonList(uri.toString()));
         }
-
+        // 8. 生成程序配置对象
         final ApplicationConfiguration applicationConfiguration =
                 new ApplicationConfiguration(
                         programOptions.getProgramArgs(), programOptions.getEntryPointClassName());
+        // 9. 部署运行程序
         deployer.run(effectiveConfiguration, applicationConfiguration);
     }
 
@@ -220,33 +225,36 @@ public class CliFrontend {
      */
     protected void run(String[] args) throws Exception {
         LOG.info("Running 'run' command.");
-
+        // 1. 获取run命令的一些运行命令参数Option 如-s ,-n(allowNonRestoredState), --jarFile , --class , -h 等
         final Options commandOptions = CliFrontendParser.getRunCommandOptions();
+        // 2. 通过commandOptions和args构建CommandLine
         final CommandLine commandLine = getCommandLine(commandOptions, args, true);
 
-        // evaluate help flag
+        // 3. 如果是-h 直接打印run命令的帮助信息
         if (commandLine.hasOption(HELP_OPTION.getOpt())) {
             CliFrontendParser.printHelpForRun(customCommandLines);
             return;
         }
-
+        // 4. 通过commandLine从customCommandLines命令容器中获取对应的CustomCommandLine(前面四种CustomCommandLine中的一种)
         final CustomCommandLine activeCommandLine =
                 validateAndGetActiveCommandLine(checkNotNull(commandLine));
-
+        // 5. 
         final ProgramOptions programOptions = ProgramOptions.create(commandLine);
-
+        // 获取程序依赖的Jar包URI
         final List<URL> jobJars = getJobJarAndDependencies(programOptions);
 
         final Configuration effectiveConfiguration =
                 getEffectiveConfiguration(activeCommandLine, commandLine, programOptions, jobJars);
 
         LOG.debug("Effective executor configuration: {}", effectiveConfiguration);
-
+        // 8. 初始化打包的任务执行程序
         final PackagedProgram program = getPackagedProgram(programOptions, effectiveConfiguration);
 
         try {
+            // 9. 执行任务程序
             executeProgram(effectiveConfiguration, program);
         } finally {
+            // 10. 删除依赖库
             program.deleteExtractedLibraries();
         }
     }
@@ -265,7 +273,7 @@ public class CliFrontend {
                     "Could not get job jar and dependencies from JAR file: " + e.getMessage(), e);
         }
     }
-
+    
     private PackagedProgram getPackagedProgram(
             ProgramOptions programOptions, Configuration effectiveConfiguration)
             throws ProgramInvocationException, CliArgsException {
@@ -279,7 +287,7 @@ public class CliFrontend {
         }
         return program;
     }
-
+    // 添加命令选项到Configuration中
     private <T> Configuration getEffectiveConfiguration(
             final CustomCommandLine activeCustomCommandLine, final CommandLine commandLine)
             throws FlinkException {
@@ -813,6 +821,7 @@ public class CliFrontend {
 
     protected void executeProgram(final Configuration configuration, final PackagedProgram program)
             throws ProgramInvocationException {
+        // 通过ClientUtils.executeProgram执行程序
         ClientUtils.executeProgram(
                 new DefaultExecutorServiceLoader(), configuration, program, false, false);
     }
@@ -830,7 +839,8 @@ public class CliFrontend {
     /**
      * Creates a Packaged program from the given command line options and the
      * effectiveConfiguration.
-     *
+     * 创建打包程序对象，主要包含了运行的jar包文件，classpath，程序运行的入口类，
+     *  程序运行的配置，savepoint和程序运行的参数等信息
      * @return A PackagedProgram (upon success)
      */
     PackagedProgram buildProgram(final ProgramOptions runOptions, final Configuration configuration)
