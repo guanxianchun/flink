@@ -66,6 +66,14 @@ public enum YarnDeploymentTarget {
         return name;
     }
 
+    /**
+     * 检查-t/--target值(入参configValue) 是否为下面三种值
+     *     PER_JOB("yarn-per-job"),
+     *     SESSION("yarn-session"),
+     *     APPLICATION("yarn-application");
+     * @param configValue
+     * @return
+     */
     public static boolean isValidYarnTarget(final String configValue) {
         return configValue != null
                 && Arrays.stream(YarnDeploymentTarget.values())

@@ -505,7 +505,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
      * This method will block until the ApplicationMaster/JobManager have been deployed on YARN.
      *
      * @param clusterSpecification Initial cluster specification for the Flink cluster to be
-     *     deployed
+     *         deployed
      * @param applicationName name of the Yarn application to start
      * @param yarnClusterEntrypoint Class name of the Yarn cluster entry point.
      * @param jobGraph A job graph which is deployed with the Flink cluster, {@code null} if none
@@ -718,7 +718,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
             List<QueueInfo> queues = yarnClient.getAllQueues();
             if (queues.size() > 0
                     && this.yarnQueue
-                            != null) { // check only if there are queues configured in yarn and for
+                    != null) { // check only if there are queues configured in yarn and for
                 // this session.
                 boolean queueFound = false;
                 for (QueueInfo queue : queues) {
@@ -751,6 +751,21 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
         }
     }
 
+    /**
+     * 启动ApplicationMaster和JobManager
+     *
+     * @param configuration
+     * @param applicationName
+     * @param yarnClusterEntrypoint
+     * @param jobGraph
+     * @param yarnClient
+     * @param yarnApplication
+     * @param clusterSpecification
+     *
+     * @return
+     *
+     * @throws Exception
+     */
     private ApplicationReport startAppMaster(
             Configuration configuration,
             String applicationName,
@@ -937,7 +952,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
             try {
                 tmpJobGraphFile = File.createTempFile(appId.toString(), null);
                 try (FileOutputStream output = new FileOutputStream(tmpJobGraphFile);
-                        ObjectOutputStream obOutput = new ObjectOutputStream(output)) {
+                     ObjectOutputStream obOutput = new ObjectOutputStream(output)) {
                     obOutput.writeObject(jobGraph);
                 }
 
@@ -1232,6 +1247,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
      * home directory.
      *
      * @param fileSystem file system used
+     *
      * @return the remote target home directory
      */
     private Path getStagingDir(FileSystem fileSystem) {
@@ -1436,7 +1452,8 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
         private final Method applicationTagsMethod;
         private final Method attemptFailuresValidityIntervalMethod;
         private final Method keepContainersMethod;
-        @Nullable private final Method nodeLabelExpressionMethod;
+        @Nullable
+        private final Method nodeLabelExpressionMethod;
 
         private ApplicationSubmissionContextReflector(Class<ApplicationSubmissionContext> clazz) {
             Method applicationTagsMethod;

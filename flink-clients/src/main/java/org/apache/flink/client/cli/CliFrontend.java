@@ -266,6 +266,14 @@ public class CliFrontend {
         }
     }
 
+    /**
+     * 权限程序选项和配置获取打包程序对象
+     * @param programOptions
+     * @param effectiveConfiguration
+     * @return
+     * @throws ProgramInvocationException
+     * @throws CliArgsException
+     */
     private PackagedProgram getPackagedProgram(
             ProgramOptions programOptions, Configuration effectiveConfiguration)
             throws ProgramInvocationException, CliArgsException {
