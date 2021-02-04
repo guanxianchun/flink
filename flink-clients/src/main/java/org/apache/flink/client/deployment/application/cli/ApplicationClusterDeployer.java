@@ -56,14 +56,17 @@ public class ApplicationClusterDeployer implements ApplicationDeployer {
         checkNotNull(applicationConfiguration);
 
         LOG.info("Submitting application in 'Application Mode'.");
-
+        // 1. 通过配置文件获取相应的集群客户端工厂 如：YarnClusterClientFactory, StandaloneClientFactory,
+        //    KubernatesClusterClientFactory, DummyClusterClientFactory等客户端工厂类
         final ClusterClientFactory<ClusterID> clientFactory =
                 clientServiceLoader.getClusterClientFactory(configuration);
+        // 2. 创建集群的描述信息对象
         try (final ClusterDescriptor<ClusterID> clusterDescriptor =
                 clientFactory.createClusterDescriptor(configuration)) {
+            //3. 获取集群的具体配置信息
             final ClusterSpecification clusterSpecification =
                     clientFactory.getClusterSpecification(configuration);
-
+            //4. 部署应用程序到Flink集群
             clusterDescriptor.deployApplicationCluster(
                     clusterSpecification, applicationConfiguration);
         }

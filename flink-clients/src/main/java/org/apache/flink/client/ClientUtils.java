@@ -95,14 +95,14 @@ public enum ClientUtils {
             LOG.info(
                     "Starting program (detached: {})",
                     !configuration.getBoolean(DeploymentOptions.ATTACHED));
-
+            // 设置程序运行的上下文
             ContextEnvironment.setAsContext(
                     executorServiceLoader,
                     configuration,
                     userCodeClassLoader,
                     enforceSingleJobExecution,
                     suppressSysout);
-
+            // 设置流处理的运行环境上下文
             StreamContextEnvironment.setAsContext(
                     executorServiceLoader,
                     configuration,
@@ -111,6 +111,7 @@ public enum ClientUtils {
                     suppressSysout);
 
             try {
+                // 运行打包程序中的main函数
                 program.invokeInteractiveModeForExecution();
             } finally {
                 ContextEnvironment.unsetAsContext();
