@@ -87,7 +87,7 @@ public class CliFrontendParser {
 
     /**
      * @deprecated use non-prefixed variant {@link #DETACHED_OPTION} for both YARN and non-YARN
-     *     deployments
+     *         deployments
      */
     @Deprecated
     public static final Option YARN_DETACHED_OPTION =
@@ -327,6 +327,13 @@ public class CliFrontendParser {
         return options;
     }
 
+    /**
+     * 获取运行的默认配置项，可选配置项
+     *
+     * @param options
+     *
+     * @return
+     */
     private static Options getProgramSpecificOptions(Options options) {
         options.addOption(JAR_OPTION);
         options.addOption(CLASS_OPTION);
@@ -569,7 +576,7 @@ public class CliFrontendParser {
      *
      * @param formatter The formatter to use for printing
      * @param runOptions True if the run options should be printed, False to print only general
-     *     options
+     *         options
      */
     private static void printCustomCliOptions(
             Collection<CustomCommandLine> customCommandLines,
@@ -619,6 +626,7 @@ public class CliFrontendParser {
      *
      * @param optionsA options to merge, can be null if none
      * @param optionsB options to merge, can be null if none
+     *
      * @return
      */
     public static Options mergeOptions(@Nullable Options optionsA, @Nullable Options optionsB) {

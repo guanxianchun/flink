@@ -390,28 +390,31 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
     public Configuration toConfiguration(CommandLine commandLine) throws FlinkException {
         // we ignore the addressOption because it can only contain "yarn-cluster"
         final Configuration effectiveConfiguration = new Configuration();
-
+        // TODO 将zk , yarn的appName,queue等信息添加到配置中
         applyDescriptorOptionToConfig(commandLine, effectiveConfiguration);
-
+        // TODO 指定了yarn appId
         final ApplicationId applicationId = getApplicationId(commandLine);
         if (applicationId != null) {
             final String zooKeeperNamespace;
+            // TODO 添加HA配置
             if (commandLine.hasOption(zookeeperNamespace.getOpt())) {
                 zooKeeperNamespace = commandLine.getOptionValue(zookeeperNamespace.getOpt());
             } else {
                 zooKeeperNamespace =
                         effectiveConfiguration.getString(HA_CLUSTER_ID, applicationId.toString());
             }
-
             effectiveConfiguration.setString(HA_CLUSTER_ID, zooKeeperNamespace);
+            // TODO 设置yarnAppId
             effectiveConfiguration.setString(
                     YarnConfigOptions.APPLICATION_ID, ConverterUtils.toString(applicationId));
+            // TODO 设置执行器为yarn-session
             effectiveConfiguration.setString(
                     DeploymentOptions.TARGET, YarnSessionClusterExecutor.NAME);
         } else {
+            // TODO 设置执行器为yarn-pre-job
             effectiveConfiguration.setString(DeploymentOptions.TARGET, YarnJobClusterExecutor.NAME);
         }
-
+        // TODO 设置jm的内存
         if (commandLine.hasOption(jmMemory.getOpt())) {
             String jmMemoryVal = commandLine.getOptionValue(jmMemory.getOpt());
             if (!MemorySize.MemoryUnit.hasUnit(jmMemoryVal)) {
@@ -420,7 +423,7 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
             effectiveConfiguration.set(
                     JobManagerOptions.TOTAL_PROCESS_MEMORY, MemorySize.parse(jmMemoryVal));
         }
-
+        // TODO 设置TM的内存
         if (commandLine.hasOption(tmMemory.getOpt())) {
             String tmMemoryVal = commandLine.getOptionValue(tmMemory.getOpt());
             if (!MemorySize.MemoryUnit.hasUnit(tmMemoryVal)) {
@@ -429,13 +432,13 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
             effectiveConfiguration.set(
                     TaskManagerOptions.TOTAL_PROCESS_MEMORY, MemorySize.parse(tmMemoryVal));
         }
-
+        // TODO 设置slot
         if (commandLine.hasOption(slots.getOpt())) {
             effectiveConfiguration.setInteger(
                     TaskManagerOptions.NUM_TASK_SLOTS,
                     Integer.parseInt(commandLine.getOptionValue(slots.getOpt())));
         }
-
+        // TODO 设置动态属性 -DpropertyName=propertyValue
         dynamicPropertiesEncoded = encodeDynamicProperties(commandLine);
         if (!dynamicPropertiesEncoded.isEmpty()) {
             Map<String, String> dynProperties = getDynamicProperties(dynamicPropertiesEncoded);
@@ -471,32 +474,33 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
         checkNotNull(configuration);
 
         final Path localJarPath = getLocalFlinkDistPathFromCmd(commandLine);
+        // TODO 本地jar包，设置yarn.flink-dist-jar
         if (localJarPath != null) {
             configuration.setString(YarnConfigOptions.FLINK_DIST_JAR, localJarPath.toString());
         }
-
+        // TODO 将--ship参数值添加到配置中
         encodeFilesToShipToCluster(configuration, commandLine);
-
+        // TODO 设置yarn的队列
         if (commandLine.hasOption(queue.getOpt())) {
             final String queueName = commandLine.getOptionValue(queue.getOpt());
             configuration.setString(YarnConfigOptions.APPLICATION_QUEUE, queueName);
         }
-
+        // TODO 设置是否detached
         final boolean detached =
                 commandLine.hasOption(YARN_DETACHED_OPTION.getOpt())
                         || commandLine.hasOption(DETACHED_OPTION.getOpt());
         configuration.setBoolean(DeploymentOptions.ATTACHED, !detached);
-
+        // TODO 配置yarn appName
         if (commandLine.hasOption(name.getOpt())) {
             final String appName = commandLine.getOptionValue(name.getOpt());
             configuration.setString(YarnConfigOptions.APPLICATION_NAME, appName);
         }
-
+        // TODO 配置applicationType
         if (commandLine.hasOption(applicationType.getOpt())) {
             final String appType = commandLine.getOptionValue(applicationType.getOpt());
             configuration.setString(YarnConfigOptions.APPLICATION_TYPE, appType);
         }
-
+        // TODO zk配置
         if (commandLine.hasOption(zookeeperNamespace.getOpt())) {
             String zookeeperNamespaceValue =
                     commandLine.getOptionValue(zookeeperNamespace.getOpt());
@@ -506,12 +510,12 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
                     commandLine.getOptionValue(zookeeperNamespaceOption.getOpt());
             configuration.setString(HA_CLUSTER_ID, zookeeperNamespaceValue);
         }
-
+        // TODO
         if (commandLine.hasOption(nodeLabel.getOpt())) {
             final String nodeLabelValue = commandLine.getOptionValue(this.nodeLabel.getOpt());
             configuration.setString(YarnConfigOptions.NODE_LABEL, nodeLabelValue);
         }
-
+        // TODO 配置$internal.deployment.config-dir值为配置文件目录
         configuration.set(DeploymentOptionsInternal.CONF_DIR, configurationDirectory);
     }
 

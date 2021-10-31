@@ -109,7 +109,7 @@ public final class GlobalConfiguration {
             throw new IllegalArgumentException(
                     "Given configuration directory is null, cannot load configuration");
         }
-
+        // TODO 1. 从配置目录下的flink-conf.yaml文件中加载配置
         final File confDirFile = new File(configDir);
         if (!(confDirFile.exists())) {
             throw new IllegalConfigurationException(
@@ -120,7 +120,7 @@ public final class GlobalConfiguration {
                             + ") does not describe an existing directory.");
         }
 
-        // get Flink yaml configuration file
+        // TODO 2. 获取目录下的flink-conf.yaml文件
         final File yamlConfigFile = new File(confDirFile, FLINK_CONF_FILENAME);
 
         if (!yamlConfigFile.exists()) {
@@ -131,7 +131,7 @@ public final class GlobalConfiguration {
                             + yamlConfigFile.getAbsolutePath()
                             + ") does not exist.");
         }
-
+        // TODO 3. 从flink-conf.yaml文件中加载配置项
         Configuration configuration = loadYAMLResource(yamlConfigFile);
 
         if (dynamicProperties != null) {

@@ -241,9 +241,11 @@ public enum PackagedProgramUtils {
 
     public static URI resolveURI(String path) throws URISyntaxException {
         final URI uri = new URI(path);
+        // TODO 存在schema 如 hdfs:///
         if (uri.getScheme() != null) {
             return uri;
         }
+        // TODO 如果jar包是本地的得到全路径
         return new File(path).getAbsoluteFile().toURI();
     }
 

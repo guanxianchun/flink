@@ -56,14 +56,15 @@ public class ApplicationClusterDeployer implements ApplicationDeployer {
         checkNotNull(applicationConfiguration);
 
         LOG.info("Submitting application in 'Application Mode'.");
-
+        // TODO 1. 获取集群客户端工厂
         final ClusterClientFactory<ClusterID> clientFactory =
                 clientServiceLoader.getClusterClientFactory(configuration);
+        // TODO 2. 创建集群描述器
         try (final ClusterDescriptor<ClusterID> clusterDescriptor =
                 clientFactory.createClusterDescriptor(configuration)) {
             final ClusterSpecification clusterSpecification =
                     clientFactory.getClusterSpecification(configuration);
-
+            // TODO 3. 部署应用
             clusterDescriptor.deployApplicationCluster(
                     clusterSpecification, applicationConfiguration);
         }

@@ -168,25 +168,38 @@ public class CliFrontend {
 
     protected void runApplication(String[] args) throws Exception {
         LOG.info("Running 'run-application' command.");
-
+        // TODO 1. 获取运行命令项
         final Options commandOptions = CliFrontendParser.getRunCommandOptions();
+        // TODO 2. 获取命令行
         final CommandLine commandLine = getCommandLine(commandOptions, args, true);
 
         if (commandLine.hasOption(HELP_OPTION.getOpt())) {
             CliFrontendParser.printHelpForRunApplication(customCommandLines);
             return;
         }
-
+        // TODO 3. 验证并获取使用那种客户命令行提交任务（Generic,Yarn,Default三种之中的一种)
+        /**
+         * Generic :
+         *   --execution.target  remote, local, yarn-per-job , yarn-session, kubernetes-session
+         *   --executor(-e)  兼容老版本
+         *   --target(-t)   同execution.target
+         * Yarn:
+         *    -m yarn-cluster
+         *    -t yarn-pre-job 或 yarn-session
+         *    指定yarn session对应的AppId
+         * 最后是默认 DefaultCli
+         */
         final CustomCommandLine activeCommandLine =
                 validateAndGetActiveCommandLine(checkNotNull(commandLine));
-
+        // TODO 4. 新建应用程序部署器
         final ApplicationDeployer deployer =
                 new ApplicationClusterDeployer(clusterClientServiceLoader);
 
         final ProgramOptions programOptions;
         final Configuration effectiveConfiguration;
 
-        // No need to set a jarFile path for Pyflink job.
+        // No need to set a jarFile path for Pyflink job. 是否是Pyflink
+        // TODO 5. 获取程序运行的选项和有效的配置
         if (ProgramOptionsUtils.isPythonEntryPoint(commandLine)) {
             programOptions = ProgramOptionsUtils.createPythonProgramOptions(commandLine);
             effectiveConfiguration =
@@ -197,8 +210,11 @@ public class CliFrontend {
                             Collections.emptyList());
         } else {
             programOptions = new ProgramOptions(commandLine);
+            // TODO 5.1 检查运行jar包路径不为空
             programOptions.validate();
+            // TODO 5.2 获取运行的jar包路径
             final URI uri = PackagedProgramUtils.resolveURI(programOptions.getJarFilePath());
+            // TODO 5.3 获取有效配置
             effectiveConfiguration =
                     getEffectiveConfiguration(
                             activeCommandLine,
@@ -206,10 +222,11 @@ public class CliFrontend {
                             programOptions,
                             Collections.singletonList(uri.toString()));
         }
-
+        // TODO 6. 新建一个应用程序配置对象
         final ApplicationConfiguration applicationConfiguration =
                 new ApplicationConfiguration(
                         programOptions.getProgramArgs(), programOptions.getEntryPointClassName());
+        // TODO 7. 使用应用程序部署器运行应用程序
         deployer.run(effectiveConfiguration, applicationConfiguration);
     }
 
@@ -281,7 +298,7 @@ public class CliFrontend {
             throws FlinkException {
 
         final Configuration effectiveConfiguration = new Configuration(configuration);
-
+        // TODO 添加命令行的配置：JM内存，TM内存，slot，-DpropertyName=propertyValue等
         final Configuration commandLineConfiguration =
                 checkNotNull(activeCustomCommandLine).toConfiguration(commandLine);
 
@@ -687,6 +704,7 @@ public class CliFrontend {
             throws CliArgsException {
         final Options commandLineOptions =
                 CliFrontendParser.mergeOptions(commandOptions, customCommandLineOptions);
+        // TODO 解释命令行的参数得到CommandLine
         return CliFrontendParser.parse(commandLineOptions, args, stopAtNonOptions);
     }
 
@@ -1046,7 +1064,7 @@ public class CliFrontend {
 
         // remove action from parameters
         final String[] params = Arrays.copyOfRange(args, 1, args.length);
-
+        // 根据我们输入的命令类型，找到相应的执行方法
         try {
             // do action
             switch (action) {
@@ -1113,14 +1131,15 @@ public class CliFrontend {
     public static void main(final String[] args) {
         EnvironmentInformation.logEnvironmentInfo(LOG, "Command Line Client", args);
 
-        // 1. find the configuration directory
+        // TODO 1. find the configuration directory 找到conf配置目录
+        // TODO    如果希望从命令行指定的位置下加载配置
         final String configurationDirectory = getConfigurationDirectoryFromEnv();
 
-        // 2. load the global configuration
+        // TODO 2. load the global configuration  从conf目录下加载flink-conf.yml配置
         final Configuration configuration =
                 GlobalConfiguration.loadConfiguration(configurationDirectory);
 
-        // 3. load the custom command lines
+        // TODO 3. load the custom command lines 加载客户命令行(Generic,Yarn,Default三种命令行)
         final List<CustomCommandLine> customCommandLines =
                 loadCustomCommandLines(configuration, configurationDirectory);
 
@@ -1129,6 +1148,7 @@ public class CliFrontend {
             final CliFrontend cli = new CliFrontend(configuration, customCommandLines);
 
             SecurityUtils.install(new SecurityConfiguration(cli.configuration));
+            // TODO 4. 解释命令行参数并执行
             retCode = SecurityUtils.getInstalledContext().runSecured(() -> cli.parseAndRun(args));
         } catch (Throwable t) {
             final Throwable strippedThrowable =
@@ -1145,6 +1165,7 @@ public class CliFrontend {
     // --------------------------------------------------------------------------------------------
 
     public static String getConfigurationDirectoryFromEnv() {
+        // TODO 1. 从环境变量FLINK_CONF_DIR获取flink的conf配置目录
         String location = System.getenv(ConfigConstants.ENV_FLINK_CONF_DIR);
 
         if (location != null) {
@@ -1159,8 +1180,10 @@ public class CliFrontend {
                                 + "' environment variable, does not exist.");
             }
         } else if (new File(CONFIG_DIRECTORY_FALLBACK_1).exists()) {
+            // TODO 如果存在../conf目录，则用该目录
             location = CONFIG_DIRECTORY_FALLBACK_1;
         } else if (new File(CONFIG_DIRECTORY_FALLBACK_2).exists()) {
+            // TODO 存在conf目录，则用该目录
             location = CONFIG_DIRECTORY_FALLBACK_2;
         } else {
             throw new RuntimeException(
@@ -1187,13 +1210,16 @@ public class CliFrontend {
 
     public static List<CustomCommandLine> loadCustomCommandLines(
             Configuration configuration, String configurationDirectory) {
+        // TODO 1. 要返回的客户命令行集合
         List<CustomCommandLine> customCommandLines = new ArrayList<>();
+        // TODO 2. 添加Generic命令行
         customCommandLines.add(new GenericCLI(configuration, configurationDirectory));
 
         //	Command line interface of the YARN session, with a special initialization here
         //	to prefix all options with y/yarn.
         final String flinkYarnSessionCLI = "org.apache.flink.yarn.cli.FlinkYarnSessionCli";
         try {
+            // TODO 3. 加载Yarn客户命令行
             customCommandLines.add(
                     loadCustomCommandLine(
                             flinkYarnSessionCLI,
@@ -1214,6 +1240,7 @@ public class CliFrontend {
         //	Tips: DefaultCLI must be added at last, because getActiveCustomCommandLine(..) will get
         // the
         //	      active CustomCommandLine in order and DefaultCLI isActive always return true.
+        // TODO 4. 最后添加Default命令行
         customCommandLines.add(new DefaultCLI());
 
         return customCommandLines;

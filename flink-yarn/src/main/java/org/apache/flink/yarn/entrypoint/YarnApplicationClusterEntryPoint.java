@@ -89,7 +89,7 @@ public final class YarnApplicationClusterEntryPoint extends ApplicationClusterEn
                         YarnApplicationClusterEntryPoint.class);
         final Configuration configuration =
                 YarnEntrypointUtils.loadConfiguration(workingDirectory, dynamicParameters, env);
-
+        // TODO 获取打包的程序
         PackagedProgram program = null;
         try {
             program = getPackagedProgram(configuration);
@@ -130,7 +130,7 @@ public final class YarnApplicationClusterEntryPoint extends ApplicationClusterEn
             final String[] programArguments,
             @Nullable final String jobClassName)
             throws FlinkException {
-
+        // TODO 获取
         final File userLibDir = YarnEntrypointUtils.getUsrLibDir(configuration).orElse(null);
         final File userApplicationJar = getUserApplicationJar(userLibDir, configuration);
         return DefaultPackagedProgramRetriever.create(
