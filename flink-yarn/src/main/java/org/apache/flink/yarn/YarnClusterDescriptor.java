@@ -860,7 +860,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
                             .map(Path::new)
                             .collect(Collectors.toSet()));
         }
-        // TODO 添加pipeline.jars配置的jar包
+        // TODO 添加pipeline.jars配置的jar包(加载用户自定义UDF函数的jar包)
         final List<URI> jarUrls =
                 ConfigUtils.decodeListFromConfig(configuration, PipelineOptions.JARS, URI::create);
         if (jarUrls != null
@@ -1102,7 +1102,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
         final JobManagerProcessSpec processSpec =
                 JobManagerProcessUtils.processSpecFromConfigWithNewOptionToInterpretLegacyHeap(
                         flinkConfiguration, JobManagerOptions.TOTAL_PROCESS_MEMORY);
-        // TODO 启动AppMaster容器
+        // TODO 设置AppMaster容器启动上下文
         final ContainerLaunchContext amContainer =
                 setupApplicationMasterContainer(yarnClusterEntrypoint, hasKrb5, processSpec);
 
@@ -1210,7 +1210,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
                 new DeploymentFailureHook(yarnApplication, fileUploader.getApplicationDir());
         Runtime.getRuntime().addShutdownHook(deploymentFailureHook);
         LOG.info("Submitting application master " + appId);
-        // TODO 提交应用
+        // TODO 提交应用，创建AppMaster和JobManager(JobMaster)
         yarnClient.submitApplication(appContext);
 
         LOG.info("Waiting for the cluster to be allocated");
