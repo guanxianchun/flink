@@ -31,11 +31,7 @@ import java.util.Objects;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
-/** 
-  * Application-specific configurations. 
-  * 应用程序具体配置类： 程序运行的参数和程序运行的mainClass类
-  * 
-  */
+/** Application-specific configurations. 应用程序具体配置类： 程序运行的参数和程序运行的mainClass类 */
 @Internal
 public class ApplicationConfiguration {
 
@@ -79,7 +75,7 @@ public class ApplicationConfiguration {
 
     public static ApplicationConfiguration fromConfiguration(final Configuration configuration) {
         checkNotNull(configuration);
-        //1. 从程序运行的参数字符串中获取参数列表
+        // 1. 从程序运行的参数字符串中获取参数列表
         final List<String> programArgsList =
                 ConfigUtils.decodeListFromConfig(configuration, APPLICATION_ARGS, String::new);
 

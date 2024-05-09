@@ -276,6 +276,7 @@ public class CliFrontend {
 
     /**
      * 权限程序选项和配置获取打包程序对象
+     *
      * @param programOptions
      * @param effectiveConfiguration
      * @return
@@ -846,9 +847,9 @@ public class CliFrontend {
 
     /**
      * Creates a Packaged program from the given command line options and the
-     * effectiveConfiguration.
-     * 创建打包程序对象，主要包含了运行的jar包文件，classpath，程序运行的入口类，
-     *  程序运行的配置，savepoint和程序运行的参数等信息
+     * effectiveConfiguration. 创建打包程序对象，主要包含了运行的jar包文件，classpath，程序运行的入口类，
+     * 程序运行的配置，savepoint和程序运行的参数等信息
+     *
      * @return A PackagedProgram (upon success)
      */
     PackagedProgram buildProgram(final ProgramOptions runOptions, final Configuration configuration)
@@ -1209,6 +1210,7 @@ public class CliFrontend {
 
     /**
      * 添加自定义命令行
+     *
      * @param configuration 配置项
      * @param configurationDirectory 配置文件目录
      * @return
@@ -1275,8 +1277,7 @@ public class CliFrontend {
     }
 
     /**
-     * 通过反射构造命令行
-     * Loads a class from the classpath that implements the CustomCommandLine interface.
+     * 通过反射构造命令行 Loads a class from the classpath that implements the CustomCommandLine interface.
      *
      * @param className The fully-qualified class name to load. 要加载的命令行类的类名
      * @param params The constructor parameters 命令行类的构造参数

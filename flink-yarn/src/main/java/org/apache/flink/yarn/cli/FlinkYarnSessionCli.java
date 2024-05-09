@@ -313,7 +313,7 @@ public class FlinkYarnSessionCli extends AbstractYarnCli {
                                 + '.',
                         ioe);
             }
-            //从配置文件中获取YarnApplicationID字符串
+            // 从配置文件中获取YarnApplicationID字符串
             final String yarnApplicationIdString =
                     yarnPropertiesFile.getProperty(YARN_APPLICATION_ID_KEY);
 

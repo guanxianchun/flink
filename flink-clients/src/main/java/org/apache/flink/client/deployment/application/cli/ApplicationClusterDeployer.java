@@ -63,10 +63,10 @@ public class ApplicationClusterDeployer implements ApplicationDeployer {
         // 2. 创建集群的描述信息对象
         try (final ClusterDescriptor<ClusterID> clusterDescriptor =
                 clientFactory.createClusterDescriptor(configuration)) {
-            //3. 获取集群的具体配置信息
+            // 3. 获取集群的具体配置信息
             final ClusterSpecification clusterSpecification =
                     clientFactory.getClusterSpecification(configuration);
-            //4. 部署应用程序到Flink集群
+            // 4. 部署应用程序到Flink集群
             clusterDescriptor.deployApplicationCluster(
                     clusterSpecification, applicationConfiguration);
         }

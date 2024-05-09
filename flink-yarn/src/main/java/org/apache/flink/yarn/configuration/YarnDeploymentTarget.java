@@ -67,10 +67,9 @@ public enum YarnDeploymentTarget {
     }
 
     /**
-     * 检查-t/--target值(入参configValue) 是否为下面三种值
-     *     PER_JOB("yarn-per-job"),
-     *     SESSION("yarn-session"),
-     *     APPLICATION("yarn-application");
+     * 检查-t/--target值(入参configValue) 是否为下面三种值 PER_JOB("yarn-per-job"), SESSION("yarn-session"),
+     * APPLICATION("yarn-application");
+     *
      * @param configValue
      * @return
      */

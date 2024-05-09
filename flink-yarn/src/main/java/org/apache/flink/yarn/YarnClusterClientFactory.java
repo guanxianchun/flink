@@ -45,6 +45,7 @@ public class YarnClusterClientFactory
         extends AbstractContainerizedClusterClientFactory<ApplicationId> {
     /**
      * 检查-t/--target参数值是否为：yarn-per-job , yarn-session , yarn-application
+     *
      * @param configuration
      * @return
      */
@@ -57,6 +58,7 @@ public class YarnClusterClientFactory
 
     /**
      * 创建YarnClient描述对象
+     *
      * @param configuration containing the configuration options relevant for the {@link
      *     org.apache.flink.client.deployment.ClusterDescriptor}
      * @return
@@ -64,11 +66,11 @@ public class YarnClusterClientFactory
     @Override
     public YarnClusterDescriptor createClusterDescriptor(Configuration configuration) {
         checkNotNull(configuration);
-        //1. 获取部署配置临时目录
+        // 1. 获取部署配置临时目录
         final String configurationDirectory = configuration.get(DeploymentOptionsInternal.CONF_DIR);
-        //2. 设置yarn日志文件目录
+        // 2. 设置yarn日志文件目录
         YarnLogConfigUtil.setLogConfigFileInConfig(configuration, configurationDirectory);
-        //3. 获取要部署的Yan集群描述对象
+        // 3. 获取要部署的Yan集群描述对象
         return getClusterDescriptor(configuration);
     }
 
@@ -86,15 +88,15 @@ public class YarnClusterClientFactory
     }
 
     private YarnClusterDescriptor getClusterDescriptor(Configuration configuration) {
-        //1. 创建Yarn客户端
+        // 1. 创建Yarn客户端
         final YarnClient yarnClient = YarnClient.createYarnClient();
-        //2. 创建Yarn配置对象
+        // 2. 创建Yarn配置对象
         final YarnConfiguration yarnConfiguration = new YarnConfiguration();
-        //3. 客户端初始化yarn配置
+        // 3. 客户端初始化yarn配置
         yarnClient.init(yarnConfiguration);
-        //4. 启动yarn客户服务(historyService)
+        // 4. 启动yarn客户服务(historyService)
         yarnClient.start();
-        //5. 返回Yarn集群的描述
+        // 5. 返回Yarn集群的描述
         return new YarnClusterDescriptor(
                 configuration,
                 yarnConfiguration,
