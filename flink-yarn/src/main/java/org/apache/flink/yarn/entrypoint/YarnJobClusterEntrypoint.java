@@ -61,7 +61,7 @@ public class YarnJobClusterEntrypoint extends JobClusterEntrypoint {
 
     // ------------------------------------------------------------------------
     //  The executable entry point for the Yarn Application Master Process
-    //  for a single Flink job. 
+    //  for a single Flink job.
     //  AppMaster运行的入口
     // ------------------------------------------------------------------------
 

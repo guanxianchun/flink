@@ -117,7 +117,7 @@ public class DefaultExecutionGraphBuilder {
                 PartitionGroupReleaseStrategyFactoryLoader.loadPartitionGroupReleaseStrategyFactory(
                         jobManagerConfig);
 
-        // create a new execution graph, if none exists so far
+        // TODO 创建一个新的执行图
         final DefaultExecutionGraph executionGraph;
         try {
             executionGraph =
@@ -145,6 +145,7 @@ public class DefaultExecutionGraphBuilder {
         // set the basic properties
 
         try {
+            // TODO 设置执行计划
             executionGraph.setJsonPlan(JsonPlanGenerator.generatePlan(jobGraph));
         } catch (Throwable t) {
             log.warn("Cannot create JSON plan for job", t);
@@ -311,7 +312,7 @@ public class DefaultExecutionGraphBuilder {
 
             final CheckpointCoordinatorConfiguration chkConfig =
                     snapshotSettings.getCheckpointCoordinatorConfiguration();
-
+            // TODO　==> 启动checkpoint, 创建CheckpointCoordinator，定时执行checkpoint
             executionGraph.enableCheckpointing(
                     chkConfig,
                     hooks,

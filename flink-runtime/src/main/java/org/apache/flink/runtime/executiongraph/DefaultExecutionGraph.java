@@ -427,13 +427,13 @@ public class DefaultExecutionGraph implements ExecutionGraph, InternalExecutionG
                         });
 
         checkState(checkpointCoordinatorTimer == null);
-
+        // TODO 创建定时器
         checkpointCoordinatorTimer =
                 Executors.newSingleThreadScheduledExecutor(
                         new DispatcherThreadFactory(
                                 Thread.currentThread().getThreadGroup(), "Checkpoint Timer"));
 
-        // create the coordinator that triggers and commits checkpoints and holds the state
+        // TODO 创建触发和提交checkpoint的协调器
         checkpointCoordinator =
                 new CheckpointCoordinator(
                         jobInformation.getJobId(),
@@ -461,7 +461,7 @@ public class DefaultExecutionGraph implements ExecutionGraph, InternalExecutionG
         }
 
         checkpointCoordinator.setCheckpointStatsTracker(checkpointStatsTracker);
-
+        // TODO 注册任务状态监听器，当任务running -> 启动checkpoint调度程序， 其他状态时 -> 停止checkpoint定时调度程序
         if (checkpointCoordinator.isPeriodicCheckpointingConfigured()) {
             // the periodic checkpoint scheduler is activated and deactivated as a result of
             // job status changes (running -> on, all other states -> off)
@@ -1442,6 +1442,7 @@ public class DefaultExecutionGraph implements ExecutionGraph, InternalExecutionG
 
             for (JobStatusListener listener : jobStatusListeners) {
                 try {
+                    // TODO 任务状态变化，则通知监听者
                     listener.jobStatusChanges(getJobID(), newState, timestamp, serializedError);
                 } catch (Throwable t) {
                     LOG.warn("Error while notifying JobStatusListener", t);

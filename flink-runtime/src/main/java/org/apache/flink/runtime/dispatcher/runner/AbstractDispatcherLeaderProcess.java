@@ -90,12 +90,14 @@ public abstract class AbstractDispatcherLeaderProcess implements DispatcherLeade
 
     @Override
     public final void start() {
+        // TODO 创建DispatcherGatewayService
         runIfStateIs(State.CREATED, this::startInternal);
     }
 
     private void startInternal() {
         log.info("Start {}.", getClass().getSimpleName());
         state = State.RUNNING;
+        // TODO 创建DispatcherGatewayService
         onStart();
     }
 

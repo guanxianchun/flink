@@ -1738,6 +1738,7 @@ public class CheckpointCoordinator {
             stopCheckpointScheduler();
 
             periodicScheduling = true;
+            // TODO 启动周期性checkpoint任务
             currentPeriodicTrigger = scheduleTriggerWithDelay(getRandomInitDelay());
         }
     }
@@ -1805,6 +1806,7 @@ public class CheckpointCoordinator {
     }
 
     private ScheduledFuture<?> scheduleTriggerWithDelay(long initDelay) {
+        // TODO 固定周期触发checkpoint
         return timer.scheduleAtFixedRate(
                 new ScheduledTrigger(), initDelay, baseInterval, TimeUnit.MILLISECONDS);
     }
@@ -1831,7 +1833,7 @@ public class CheckpointCoordinator {
             if (shutdown) {
                 throw new IllegalArgumentException("Checkpoint coordinator is shut down");
             }
-
+            // TODO 创建状态监听器，当状态改变时，启动或停止checkpoint调度程序
             if (jobStatusListener == null) {
                 jobStatusListener = new CheckpointCoordinatorDeActivator(this);
             }
@@ -1862,6 +1864,7 @@ public class CheckpointCoordinator {
         @Override
         public void run() {
             try {
+                // TODO 触发checkpoint快照
                 triggerCheckpoint(true);
             } catch (Exception e) {
                 LOG.error("Exception while triggering checkpoint for job {}.", job, e);

@@ -114,7 +114,7 @@ public enum JobMasterServiceLeadershipRunnerFactory implements JobManagerRunnerF
                         jobGraph.getCheckpointingSettings(),
                         initializationTimestamp,
                         jobMasterServiceFactory);
-
+        // TODO 创建JobMasterServiceLeadershipRunner
         return new JobMasterServiceLeadershipRunner(
                 jobMasterServiceProcessFactory,
                 jobManagerLeaderElectionService,

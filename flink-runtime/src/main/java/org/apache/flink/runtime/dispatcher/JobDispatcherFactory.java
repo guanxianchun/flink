@@ -48,10 +48,11 @@ public enum JobDispatcherFactory implements DispatcherFactory {
         final String executionModeValue = configuration.getString(INTERNAL_CLUSTER_EXECUTION_MODE);
         final ClusterEntrypoint.ExecutionMode executionMode =
                 ClusterEntrypoint.ExecutionMode.valueOf(executionModeValue);
-
+        // TODO 创建MiniDispatcher
         return new MiniDispatcher(
                 rpcService,
                 fencingToken,
+                // TODO 创建DispatcherServices, DispatcherServices中包含了JobMasterServiceLeadershipRunnerFactor实例来创建JobManagerRunner
                 DispatcherServices.from(
                         partialDispatcherServicesWithJobGraphStore,
                         JobMasterServiceLeadershipRunnerFactory.INSTANCE),

@@ -35,12 +35,13 @@ public enum SessionDispatcherFactory implements DispatcherFactory {
             DispatcherBootstrapFactory dispatcherBootstrapFactory,
             PartialDispatcherServicesWithJobGraphStore partialDispatcherServicesWithJobGraphStore)
             throws Exception {
-        // create the default dispatcher
+        // TODO 创建StandaloneDispatcher
         return new StandaloneDispatcher(
                 rpcService,
                 fencingToken,
                 recoveredJobs,
                 dispatcherBootstrapFactory,
+                // TODO 创建DispatcherServices, DispatcherServices中包含了JobMasterServiceLeadershipRunnerFactor实例来创建JobManagerRunner
                 DispatcherServices.from(
                         partialDispatcherServicesWithJobGraphStore,
                         JobMasterServiceLeadershipRunnerFactory.INSTANCE));

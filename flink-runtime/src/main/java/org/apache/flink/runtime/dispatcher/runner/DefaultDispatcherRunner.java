@@ -115,12 +115,13 @@ public final class DefaultDispatcherRunner implements DispatcherRunner, LeaderCo
 
     private void startNewDispatcherLeaderProcess(UUID leaderSessionID) {
         stopDispatcherLeaderProcess();
-
+        // TODO 创建新的 DispatcherLeaderProcess
         dispatcherLeaderProcess = createNewDispatcherLeaderProcess(leaderSessionID);
 
         final DispatcherLeaderProcess newDispatcherLeaderProcess = dispatcherLeaderProcess;
         FutureUtils.assertNoException(
                 previousDispatcherLeaderProcessTerminationFuture.thenRun(
+                        // TODO 启动新的 DispatcherLeaderProcess, 创建DispatcherGatewayService
                         newDispatcherLeaderProcess::start));
     }
 
@@ -218,6 +219,7 @@ public final class DefaultDispatcherRunner implements DispatcherRunner, LeaderCo
             FatalErrorHandler fatalErrorHandler,
             DispatcherLeaderProcessFactory dispatcherLeaderProcessFactory)
             throws Exception {
+        // TODO 创建DefaultDispatcherRunner
         final DefaultDispatcherRunner dispatcherRunner =
                 new DefaultDispatcherRunner(
                         leaderElectionService, fatalErrorHandler, dispatcherLeaderProcessFactory);

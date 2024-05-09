@@ -319,6 +319,7 @@ public class JobMaster extends PermanentlyFencedRpcEndpoint<JobMasterId>
 
         this.jobManagerJobMetricGroup = jobMetricGroupFactory.create(jobGraph);
         this.jobStatusListener = new JobManagerJobStatusListener();
+        // TODO 创建Flink任务调度器
         this.schedulerNG =
                 createScheduler(
                         slotPoolServiceSchedulerFactory,
@@ -342,6 +343,7 @@ public class JobMaster extends PermanentlyFencedRpcEndpoint<JobMasterId>
             JobManagerJobMetricGroup jobManagerJobMetricGroup,
             JobStatusListener jobStatusListener)
             throws Exception {
+        // TODO 创建Flink任务调度器
         final SchedulerNG scheduler =
                 slotPoolServiceSchedulerFactory.createScheduler(
                         log,

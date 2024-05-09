@@ -85,6 +85,7 @@ public class DefaultLeaderElectionService
 
         synchronized (lock) {
             leaderContender = contender;
+            // TODO 创建LeaderElectionDriver， 当为leader时, 会创建和启动JobMasterServiceProcess
             leaderElectionDriver =
                     leaderElectionDriverFactory.createLeaderElectionDriver(
                             this,
@@ -207,7 +208,7 @@ public class DefaultLeaderElectionService
                             leaderContender.getDescription(),
                             issuedLeaderSessionID);
                 }
-
+                // TODO 创建和启动JobMasterServiceProcess
                 leaderContender.grantLeadership(issuedLeaderSessionID);
             } else {
                 if (LOG.isDebugEnabled()) {

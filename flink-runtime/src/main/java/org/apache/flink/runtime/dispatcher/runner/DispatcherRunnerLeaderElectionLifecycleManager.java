@@ -36,7 +36,7 @@ final class DispatcherRunnerLeaderElectionLifecycleManager<
             T dispatcherRunner, LeaderElectionService leaderElectionService) throws Exception {
         this.dispatcherRunner = dispatcherRunner;
         this.leaderElectionService = leaderElectionService;
-
+        // TODO 启动Leader选举服务, ZookeeperHaServices的LeaderElectionService为DefaultLeaderElectionService
         leaderElectionService.start(dispatcherRunner);
     }
 

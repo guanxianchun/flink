@@ -165,6 +165,7 @@ public class ZooKeeperLeaderElectionDriver
 
     @Override
     public void isLeader() {
+        // TODO 当前为leader节点时，创建和启动JobMasterServiceProcess
         leaderElectionEventHandler.onGrantLeadership();
     }
 

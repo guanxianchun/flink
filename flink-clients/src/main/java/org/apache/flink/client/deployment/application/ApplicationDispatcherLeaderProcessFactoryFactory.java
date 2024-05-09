@@ -72,7 +72,7 @@ public class ApplicationDispatcherLeaderProcessFactoryFactory
                         program,
                         rpcService,
                         partialDispatcherServices);
-
+        // TODO 创建SessionDispatcherLeaderProcessFactory
         return new SessionDispatcherLeaderProcessFactory(
                 dispatcherServiceFactory, jobGraphStoreFactory, ioExecutor, fatalErrorHandler);
     }

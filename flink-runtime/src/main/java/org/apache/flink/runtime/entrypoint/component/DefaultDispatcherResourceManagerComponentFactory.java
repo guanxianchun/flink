@@ -208,6 +208,7 @@ public class DefaultDispatcherResourceManagerComponentFactory
                             ioExecutor);
 
             log.debug("Starting Dispatcher.");
+            // 创建和启动Dispatcher服务 Zookeeper -> DefaultLeaderElectionService
             dispatcherRunner =
                     dispatcherRunnerFactory.createDispatcherRunner(
                             highAvailabilityServices.getDispatcherLeaderElectionService(),

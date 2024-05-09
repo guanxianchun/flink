@@ -179,15 +179,9 @@ public class CliFrontend {
         }
         // TODO 3. 验证并获取使用那种客户命令行提交任务（Generic,Yarn,Default三种之中的一种)
         /**
-         * Generic :
-         *   --execution.target  remote, local, yarn-per-job , yarn-session, kubernetes-session
-         *   --executor(-e)  兼容老版本
-         *   --target(-t)   同execution.target
-         * Yarn:
-         *    -m yarn-cluster
-         *    -t yarn-pre-job 或 yarn-session
-         *    指定yarn session对应的AppId
-         * 最后是默认 DefaultCli
+         * Generic : --execution.target remote, local, yarn-per-job , yarn-session,
+         * kubernetes-session --executor(-e) 兼容老版本 --target(-t) 同execution.target Yarn: -m
+         * yarn-cluster -t yarn-pre-job 或 yarn-session 指定yarn session对应的AppId 最后是默认 DefaultCli
          */
         final CustomCommandLine activeCommandLine =
                 validateAndGetActiveCommandLine(checkNotNull(commandLine));

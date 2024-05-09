@@ -132,6 +132,7 @@ public class ZooKeeperHaServices extends AbstractHaServices {
 
     @Override
     protected LeaderElectionService createLeaderElectionService(String leaderPath) {
+        // ZooKeeper leader election service
         return ZooKeeperUtils.createLeaderElectionService(client, leaderPath);
     }
 

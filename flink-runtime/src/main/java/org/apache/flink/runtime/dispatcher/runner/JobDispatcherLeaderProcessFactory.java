@@ -44,6 +44,7 @@ public class JobDispatcherLeaderProcessFactory implements DispatcherLeaderProces
 
     @Override
     public DispatcherLeaderProcess create(UUID leaderSessionID) {
+        // TODO 创建JobDispatcherLeaderProcess
         return new JobDispatcherLeaderProcess(
                 leaderSessionID, dispatcherGatewayServiceFactory, jobGraph, fatalErrorHandler);
     }

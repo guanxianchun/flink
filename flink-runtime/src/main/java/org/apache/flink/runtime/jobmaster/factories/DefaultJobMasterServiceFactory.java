@@ -88,7 +88,7 @@ public class DefaultJobMasterServiceFactory implements JobMasterServiceFactory {
     @Override
     public CompletableFuture<JobMasterService> createJobMasterService(
             UUID leaderSessionId, OnCompletionActions onCompletionActions) {
-
+        //　TODO 创建启动JobMaster服务
         return CompletableFuture.supplyAsync(
                 FunctionUtils.uncheckedSupplier(
                         () -> internalCreateJobMasterService(leaderSessionId, onCompletionActions)),
@@ -97,7 +97,7 @@ public class DefaultJobMasterServiceFactory implements JobMasterServiceFactory {
 
     private JobMasterService internalCreateJobMasterService(
             UUID leaderSessionId, OnCompletionActions onCompletionActions) throws Exception {
-
+        // TODO 创建JobMaster， 在JobMaster中会创建Flink任务调度器
         final JobMaster jobMaster =
                 new JobMaster(
                         rpcService,
@@ -120,7 +120,7 @@ public class DefaultJobMasterServiceFactory implements JobMasterServiceFactory {
                         new DefaultExecutionDeploymentTracker(),
                         DefaultExecutionDeploymentReconciler::new,
                         initializationTimestamp);
-
+        // TODO 启动JobMaster服务
         jobMaster.start();
 
         return jobMaster;

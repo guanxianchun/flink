@@ -40,6 +40,7 @@ public class ZooKeeperLeaderElectionDriverFactory implements LeaderElectionDrive
             FatalErrorHandler fatalErrorHandler,
             String leaderContenderDescription)
             throws Exception {
+        // TODO 创建ZookeeperLeaderElectionDriver, JobManager通过该类进行选举
         return new ZooKeeperLeaderElectionDriver(
                 client, path, leaderEventHandler, fatalErrorHandler, leaderContenderDescription);
     }

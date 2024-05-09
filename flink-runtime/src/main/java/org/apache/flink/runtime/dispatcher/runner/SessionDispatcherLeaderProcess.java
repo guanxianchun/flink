@@ -93,11 +93,12 @@ public class SessionDispatcherLeaderProcess extends AbstractDispatcherLeaderProc
     }
 
     private void createDispatcherIfRunning(Collection<JobGraph> jobGraphs) {
+        // TODO 创建Dispatcher
         runIfStateIs(State.RUNNING, () -> createDispatcher(jobGraphs));
     }
 
     private void createDispatcher(Collection<JobGraph> jobGraphs) {
-
+        // TODO 创建DispatcherGatewayService
         final DispatcherGatewayService dispatcherService =
                 dispatcherGatewayServiceFactory.create(
                         DispatcherId.fromUuid(getLeaderSessionId()), jobGraphs, jobGraphStore);

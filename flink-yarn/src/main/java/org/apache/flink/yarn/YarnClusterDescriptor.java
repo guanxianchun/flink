@@ -457,10 +457,11 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
         Preconditions.checkArgument(pipelineJars.size() == 1, "Should only have one jar");
 
         try {
+            // Application部署方式部署, YarnApplicationClusterEntryPoint是容器运行启动类
             return deployInternal(
                     clusterSpecification,
                     "Flink Application Cluster",
-                    YarnApplicationClusterEntryPoint.class.getName(),  // 入口类信息
+                    YarnApplicationClusterEntryPoint.class.getName(), // 入口类信息
                     null,
                     false);
         } catch (Exception e) {
@@ -548,10 +549,8 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
         }
         // TODO 3. 部署前的配置检查，
         /**
-         * 1. flink jars path
-         * 2. flink Configuration
-         * 3. AppMaster的cpu配置是否超过了YARN的最大配置
-         * 4. 环境配置HADOOP_CONF_DIR
+         * 1. flink jars path 2. flink Configuration 3. AppMaster的cpu配置是否超过了YARN的最大配置 4.
+         * 环境配置HADOOP_CONF_DIR
          */
         isReadyForDeployment(clusterSpecification);
 
@@ -921,7 +920,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
                     LocalResourceType.ARCHIVE);
         }
 
-        // Upload and register user jars
+        // 上传和注册用户jars
         final List<String> userClassPaths =
                 fileUploader.registerMultipleLocalResources(
                         userJarFiles,
@@ -1102,7 +1101,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
         final JobManagerProcessSpec processSpec =
                 JobManagerProcessUtils.processSpecFromConfigWithNewOptionToInterpretLegacyHeap(
                         flinkConfiguration, JobManagerOptions.TOTAL_PROCESS_MEMORY);
-        // TODO 设置AppMaster容器启动上下文
+        // TODO 设置AppMaster容器启动上下文, 其中yarnClusterEntrypoint是AppMaster启动类
         final ContainerLaunchContext amContainer =
                 setupApplicationMasterContainer(yarnClusterEntrypoint, hasKrb5, processSpec);
 
@@ -1174,10 +1173,11 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
 
         // set classpath from YARN configuration
         Utils.setupYarnClassPath(yarnConfiguration, appMasterEnv);
-        // TODO 将之前封闭的Map设置到容器里
+        // TODO 将appMaster环境配置设置到容器里
         amContainer.setEnvironment(appMasterEnv);
 
-        // Set up resource type requirements for ApplicationMaster
+        // Set up resource type requirements for
+        // TODO 设置ApplicationMaster需要的资源
         Resource capability = Records.newRecord(Resource.class);
         capability.setMemory(clusterSpecification.getMasterMemoryMB());
         capability.setVirtualCores(
@@ -1190,7 +1190,7 @@ public class YarnClusterDescriptor implements ClusterDescriptor<ApplicationId> {
         appContext.setAMContainerSpec(amContainer);
         appContext.setResource(capability);
 
-        // Set priority for application
+        // application的优先级
         int priorityNum = flinkConfiguration.getInteger(YarnConfigOptions.APPLICATION_PRIORITY);
         if (priorityNum >= 0) {
             Priority priority = Priority.newInstance(priorityNum);

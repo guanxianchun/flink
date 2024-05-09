@@ -45,6 +45,7 @@ public class JobDispatcherLeaderProcess extends AbstractDispatcherLeaderProcess 
 
     @Override
     protected void onStart() {
+        // TODO 创建DispatcherGatewayService
         final DispatcherGatewayService dispatcherService =
                 dispatcherGatewayServiceFactory.create(
                         DispatcherId.fromUuid(getLeaderSessionId()),

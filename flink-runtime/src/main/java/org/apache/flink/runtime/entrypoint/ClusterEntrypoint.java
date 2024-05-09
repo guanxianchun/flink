@@ -249,7 +249,7 @@ public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErro
             // 设置JobManager的地址和端口信息
             configuration.setString(JobManagerOptions.ADDRESS, commonRpcService.getAddress());
             configuration.setInteger(JobManagerOptions.PORT, commonRpcService.getPort());
-
+            // TODO 创建Dispatcher组件
             final DispatcherResourceManagerComponentFactory
                     dispatcherResourceManagerComponentFactory =
                             createDispatcherResourceManagerComponentFactory(configuration);
@@ -312,13 +312,18 @@ public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErro
             JMXService.startInstance(configuration.getString(JMXServerOptions.JMX_SERVER_PORT));
 
             // update the configuration used to create the high availability services
+            // TODO 更新JobManager的RPC地址和端口信息
             configuration.setString(JobManagerOptions.ADDRESS, commonRpcService.getAddress());
             configuration.setInteger(JobManagerOptions.PORT, commonRpcService.getPort());
-
+            // TODO 创建IO线程池
             ioExecutor =
                     Executors.newFixedThreadPool(
                             ClusterEntrypointUtils.getPoolSize(configuration),
                             new ExecutorThreadFactory("cluster-io"));
+            /**
+             * TODO 创建HA服务, 根据HighAvailabilityMode的类型创建对应的HA服务 NONE： StandaloneHaServices ZOOKEEPER:
+             * ZooKeeperHaServices
+             */
             haServices = createHaServices(configuration, ioExecutor, rpcSystem);
             blobServer = new BlobServer(configuration, haServices.createBlobStore());
             blobServer.start();
@@ -362,6 +367,7 @@ public abstract class ClusterEntrypoint implements AutoCloseableAsync, FatalErro
     protected HighAvailabilityServices createHaServices(
             Configuration configuration, Executor executor, RpcSystemUtils rpcSystemUtils)
             throws Exception {
+        // TODO 创建HA服务
         return HighAvailabilityServicesUtils.createHighAvailabilityServices(
                 configuration,
                 executor,

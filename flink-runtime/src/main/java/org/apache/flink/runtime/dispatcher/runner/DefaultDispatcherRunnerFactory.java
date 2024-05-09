@@ -57,7 +57,7 @@ public class DefaultDispatcherRunnerFactory implements DispatcherRunnerFactory {
                         rpcService,
                         partialDispatcherServices,
                         fatalErrorHandler);
-
+        // TODO 创建DispatcherRunner
         return DefaultDispatcherRunner.create(
                 leaderElectionService, fatalErrorHandler, dispatcherLeaderProcessFactory);
     }

@@ -185,7 +185,7 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
         this.checkpointIdCounter =
                 SchedulerUtils.createCheckpointIDCounterIfCheckpointingIsEnabled(
                         jobGraph, checkNotNull(checkpointRecoveryFactory));
-
+        // TODO 创建ExecutionGraph
         this.executionGraph =
                 createAndRestoreExecutionGraph(
                         completedCheckpointStore,
@@ -206,7 +206,7 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
         this.kvStateHandler = new KvStateHandler(executionGraph);
         this.executionGraphHandler =
                 new ExecutionGraphHandler(executionGraph, log, ioExecutor, this.mainThreadExecutor);
-
+        // TODO 创建OperatorCoordinatorHandler
         this.operatorCoordinatorHandler =
                 new DefaultOperatorCoordinatorHandler(executionGraph, this::handleGlobalFailure);
         operatorCoordinatorHandler.initializeOperatorCoordinators(this.mainThreadExecutor);
@@ -329,7 +329,7 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
             ComponentMainThreadExecutor mainThreadExecutor,
             JobStatusListener jobStatusListener)
             throws Exception {
-
+        // TODO 创建一个新的执行图
         final ExecutionGraph newExecutionGraph =
                 executionGraphFactory.createAndRestoreExecutionGraph(
                         jobGraph,

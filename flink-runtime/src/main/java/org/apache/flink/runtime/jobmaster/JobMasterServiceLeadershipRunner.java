@@ -245,6 +245,7 @@ public class JobMasterServiceLeadershipRunner implements JobManagerRunner, Leade
 
     @Override
     public void grantLeadership(UUID leaderSessionID) {
+        // TODO 创建启动JobMasterServiceProcess
         runIfStateRunning(
                 () -> startJobMasterServiceProcessAsync(leaderSessionID),
                 "starting a new JobMasterServiceProcess");
@@ -252,6 +253,7 @@ public class JobMasterServiceLeadershipRunner implements JobManagerRunner, Leade
 
     @GuardedBy("lock")
     private void startJobMasterServiceProcessAsync(UUID leaderSessionId) {
+        // TODO 创建启动JobMasterServiceProcess
         sequentialOperation =
                 sequentialOperation.thenRun(
                         () ->
@@ -275,6 +277,7 @@ public class JobMasterServiceLeadershipRunner implements JobManagerRunner, Leade
         if (jobSchedulingStatus == RunningJobsRegistry.JobSchedulingStatus.DONE) {
             jobAlreadyDone();
         } else {
+            // TODO 创建新的JobMasterServiceProcess
             createNewJobMasterServiceProcess(leaderSessionId);
         }
     }
@@ -321,7 +324,7 @@ public class JobMasterServiceLeadershipRunner implements JobManagerRunner, Leade
                             getJobID()),
                     e);
         }
-
+        // TODO 创建JobMasterServiceProcess
         jobMasterServiceProcess = jobMasterServiceProcessFactory.create(leaderSessionId);
 
         forwardIfValidLeader(

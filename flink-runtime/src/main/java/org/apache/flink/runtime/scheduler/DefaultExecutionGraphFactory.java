@@ -102,7 +102,7 @@ public class DefaultExecutionGraphFactory implements ExecutionGraphFactory {
                         executionDeploymentTracker.stopTrackingDeploymentOf(execution);
                     }
                 };
-
+        // TODO 构建一个新的执行图
         final ExecutionGraph newExecutionGraph =
                 DefaultExecutionGraphBuilder.buildGraph(
                         jobGraph,
@@ -125,7 +125,7 @@ public class DefaultExecutionGraphFactory implements ExecutionGraphFactory {
                         initializationTimestamp,
                         vertexAttemptNumberStore,
                         vertexParallelismStore);
-
+        // TODO 从执行图对象中获取checkpoint协调器
         final CheckpointCoordinator checkpointCoordinator =
                 newExecutionGraph.getCheckpointCoordinator();
 
