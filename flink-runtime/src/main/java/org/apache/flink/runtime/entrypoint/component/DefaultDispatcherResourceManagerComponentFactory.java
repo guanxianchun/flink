@@ -156,7 +156,7 @@ public class DefaultDispatcherResourceManagerComponentFactory
                                     metricQueryServiceRetriever,
                                     dispatcherGatewayRetriever,
                                     executor);
-
+            // 创建和启动web rest服务
             webMonitorEndpoint =
                     restEndpointFactory.createRestEndpoint(
                             configuration,
@@ -172,7 +172,7 @@ public class DefaultDispatcherResourceManagerComponentFactory
             webMonitorEndpoint.start();
 
             final String hostname = RpcUtils.getHostname(rpcService);
-
+            // 创建ResourceManager服务
             resourceManagerService =
                     ResourceManagerServiceImpl.create(
                             resourceManagerFactory,

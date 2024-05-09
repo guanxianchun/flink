@@ -161,40 +161,44 @@ public class StreamingJobGraphGenerator {
     }
 
     private JobGraph createJobGraph() {
+        // 1. 检查checkpoint配置
         preValidate();
+        // 2. 设置任务类型: 流或批
         jobGraph.setJobType(streamGraph.getJobType());
-
+        // 3. 设置是否启用approximate local recovery
         jobGraph.enableApproximateLocalRecovery(
                 streamGraph.getCheckpointConfig().isApproximateLocalRecoveryEnabled());
 
         // Generate deterministic hashes for the nodes in order to identify them across
         // submission iff they didn't change.
+        // 4. 为节点生成确定性的哈希，以便在它们没有更改的情况下识别它们。
         Map<Integer, byte[]> hashes =
                 defaultStreamGraphHasher.traverseStreamGraphAndGenerateHashes(streamGraph);
 
         // Generate legacy version hashes for backwards compatibility
+        // 5. 生成旧版本的hash向后兼容
         List<Map<Integer, byte[]>> legacyHashes = new ArrayList<>(legacyStreamGraphHashers.size());
         for (StreamGraphHasher hasher : legacyStreamGraphHashers) {
             legacyHashes.add(hasher.traverseStreamGraphAndGenerateHashes(streamGraph));
         }
-
+        // 6. 从source设置任务链
         setChaining(hashes, legacyHashes);
-
+        // 7. 设置物理边
         setPhysicalEdges();
-
+        // 8. 设置槽共享和 colocate
         setSlotSharingAndCoLocation();
-
+        // 9. 设置管理内存
         setManagedMemoryFraction(
                 Collections.unmodifiableMap(jobVertices),
                 Collections.unmodifiableMap(vertexConfigs),
                 Collections.unmodifiableMap(chainedConfigs),
                 id -> streamGraph.getStreamNode(id).getManagedMemoryOperatorScopeUseCaseWeights(),
                 id -> streamGraph.getStreamNode(id).getManagedMemorySlotScopeUseCases());
-
+        // 10. 配置checkpoint
         configureCheckpointing();
-
+        // 11. 设置任务恢复的savepoint配置
         jobGraph.setSavepointRestoreSettings(streamGraph.getSavepointRestoreSettings());
-
+        // 12. 设置分布式缓存
         final Map<String, DistributedCache.DistributedCacheEntry> distributedCacheEntries =
                 JobGraphUtils.prepareUserArtifactEntries(
                         streamGraph.getUserArtifacts().stream()
@@ -1216,6 +1220,7 @@ public class StreamingJobGraphGenerator {
     }
 
     private void configureCheckpointing() {
+        // 1. 获取Checkpoint配置
         CheckpointConfig cfg = streamGraph.getCheckpointConfig();
 
         long interval = cfg.getCheckpointInterval();
@@ -1225,7 +1230,7 @@ public class StreamingJobGraphGenerator {
         }
 
         //  --- configure options ---
-
+        // 2. 配置Checkpoint副本保留策略
         CheckpointRetentionPolicy retentionAfterTermination;
         if (cfg.isExternalizedCheckpointsEnabled()) {
             CheckpointConfig.ExternalizedCheckpointCleanup cleanup =
@@ -1244,15 +1249,16 @@ public class StreamingJobGraphGenerator {
         }
 
         //  --- configure the master-side checkpoint hooks ---
-
+        // 3. 配置Master端的Checkpoint勾子
         final ArrayList<MasterTriggerRestoreHook.Factory> hooks = new ArrayList<>();
 
         for (StreamNode node : streamGraph.getStreamNodes()) {
             if (node.getOperatorFactory() instanceof UdfStreamOperatorFactory) {
                 Function f =
                         ((UdfStreamOperatorFactory) node.getOperatorFactory()).getUserFunction();
-
+                // 如果Function实现了WithMasterCheckpointHook接口， 只有source算子才实现了WithMasterCheckpointHook接口
                 if (f instanceof WithMasterCheckpointHook) {
+                    // 添加MasterCheckpointHook的工厂，用于创建MasterCheckpointHook
                     hooks.add(
                             new FunctionMasterCheckpointHookFactory(
                                     (WithMasterCheckpointHook<?>) f));
@@ -1262,6 +1268,7 @@ public class StreamingJobGraphGenerator {
 
         // because the hooks can have user-defined code, they need to be stored as
         // eagerly serialized values
+        // 4. 配置Serialized values hooks
         final SerializedValue<MasterTriggerRestoreHook.Factory[]> serializedHooks;
         if (hooks.isEmpty()) {
             serializedHooks = null;
@@ -1277,6 +1284,7 @@ public class StreamingJobGraphGenerator {
 
         // because the state backend can have user-defined code, it needs to be stored as
         // eagerly serialized value
+        // 5. 配置StateBackend
         final SerializedValue<StateBackend> serializedStateBackend;
         if (streamGraph.getStateBackend() == null) {
             serializedStateBackend = null;
@@ -1291,6 +1299,7 @@ public class StreamingJobGraphGenerator {
 
         // because the checkpoint storage can have user-defined code, it needs to be stored as
         // eagerly serialized value
+        // 6. 配置CheckpointStorage
         final SerializedValue<CheckpointStorage> serializedCheckpointStorage;
         if (streamGraph.getCheckpointStorage() == null) {
             serializedCheckpointStorage = null;
@@ -1304,7 +1313,7 @@ public class StreamingJobGraphGenerator {
         }
 
         //  --- done, put it all together ---
-
+        // 7. 配置JobCheckpointingSettings
         JobCheckpointingSettings settings =
                 new JobCheckpointingSettings(
                         CheckpointCoordinatorConfiguration.builder()

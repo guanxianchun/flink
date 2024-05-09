@@ -61,6 +61,7 @@ public final class FlinkPipelineTranslationUtil {
     /** Extracts the execution plan (as JSON) from the given {@link Pipeline}. */
     public static String translateToJSONExecutionPlan(Pipeline pipeline) {
         FlinkPipelineTranslator pipelineTranslator = getPipelineTranslator(pipeline);
+        // 调用FlinkPipelineTranslator.translateToJSONExecutionPlan
         return pipelineTranslator.translateToJSONExecutionPlan(pipeline);
     }
 

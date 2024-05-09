@@ -52,6 +52,7 @@ public class PipelineExecutorUtils {
 
         final ExecutionConfigAccessor executionConfigAccessor =
                 ExecutionConfigAccessor.fromConfiguration(configuration);
+        // 将pipeline转换成jobGraph
         final JobGraph jobGraph =
                 FlinkPipelineTranslationUtil.getJobGraph(
                         pipeline, configuration, executionConfigAccessor.getParallelism());

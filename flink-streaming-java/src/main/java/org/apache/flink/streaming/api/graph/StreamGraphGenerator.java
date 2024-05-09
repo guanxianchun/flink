@@ -302,15 +302,17 @@ public class StreamGraphGenerator {
     }
 
     public StreamGraph generate() {
+        //checkpointCfg和savepoint的配置被当做参数传给streamGraph
         streamGraph = new StreamGraph(executionConfig, checkpointConfig, savepointRestoreSettings);
         streamGraph.setEnableCheckpointsAfterTasksFinish(
                 configuration.get(
                         ExecutionCheckpointingOptions.ENABLE_CHECKPOINTS_AFTER_TASKS_FINISH));
         shouldExecuteInBatchMode = shouldExecuteInBatchMode();
+
         configureStreamGraph(streamGraph);
 
         alreadyTransformed = new HashMap<>();
-
+        //转换算子，将env的成员变量transformations中的算子遍历出来，塞到streamGraph中
         for (Transformation<?> transformation : transformations) {
             transform(transformation);
         }
@@ -318,7 +320,7 @@ public class StreamGraphGenerator {
         streamGraph.setSlotSharingGroupResource(slotSharingGroupResources);
 
         setFineGrainedGlobalStreamExchangeMode(streamGraph);
-
+        
         for (StreamNode node : streamGraph.getStreamNodes()) {
             if (node.getInEdges().stream().anyMatch(this::shouldDisableUnalignedCheckpointing)) {
                 for (StreamEdge edge : node.getInEdges()) {

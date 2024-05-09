@@ -1896,6 +1896,7 @@ public class StreamExecutionEnvironment {
      * @throws Exception which occurs during job execution.
      */
     public JobExecutionResult execute() throws Exception {
+        // 执行任务
         return execute(getStreamGraph());
     }
 
@@ -1928,6 +1929,7 @@ public class StreamExecutionEnvironment {
      */
     @Internal
     public JobExecutionResult execute(StreamGraph streamGraph) throws Exception {
+        // 异步执行
         final JobClient jobClient = executeAsync(streamGraph);
 
         try {
@@ -2028,7 +2030,8 @@ public class StreamExecutionEnvironment {
         checkNotNull(
                 configuration.get(DeploymentOptions.TARGET),
                 "No execution.target specified in your configuration file.");
-
+        // 如果我们提交的yarn pre-job，则PipelineExecutorFactory为YarnJobClusterExecutorFactory
+        // 对应的PipelineExecutor为YarnJobClusterExecutor
         final PipelineExecutorFactory executorFactory =
                 executorServiceLoader.getExecutorFactory(configuration);
 
@@ -2036,7 +2039,7 @@ public class StreamExecutionEnvironment {
                 executorFactory,
                 "Cannot find compatible factory for specified execution.target (=%s)",
                 configuration.get(DeploymentOptions.TARGET));
-
+        // 执行任务，调用YarnJobClusterExecutor.execute方法
         CompletableFuture<JobClient> jobClientFuture =
                 executorFactory
                         .getExecutor(configuration)
@@ -2080,6 +2083,7 @@ public class StreamExecutionEnvironment {
      */
     @Internal
     public StreamGraph getStreamGraph(boolean clearTransformations) {
+        // 获取StreamGraph, 通过创建StreamGraphGenerator对象，再调用其generate方法生成StreamGraph对象
         final StreamGraph streamGraph = getStreamGraphGenerator(transformations).generate();
         if (clearTransformations) {
             transformations.clear();
@@ -2106,7 +2110,7 @@ public class StreamExecutionEnvironment {
             throw new IllegalStateException(
                     "No operators defined in streaming topology. Cannot execute.");
         }
-
+        // 创建getStreamGraphGenerator对象来构建StreamGraph
         return new StreamGraphGenerator(transformations, config, checkpointCfg, configuration)
                 .setStateBackend(defaultStateBackend)
                 .setChangelogStateBackendEnabled(changelogStateBackendEnabled)
