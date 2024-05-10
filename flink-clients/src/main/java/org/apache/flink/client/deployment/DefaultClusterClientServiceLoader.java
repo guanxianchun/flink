@@ -55,6 +55,7 @@ public class DefaultClusterClientServiceLoader implements ClusterClientServiceLo
         while (factories.hasNext()) {
             try {
                 final ClusterClientFactory factory = factories.next();
+                LOG.info("==> ClusterClientFactory : {}", factory);
                 if (factory != null && factory.isCompatibleWith(configuration)) {
                     compatibleFactories.add(factory);
                 }

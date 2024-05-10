@@ -23,6 +23,9 @@ import org.apache.flink.client.deployment.executors.RemoteExecutor;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.DeploymentOptions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Nullable;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
@@ -30,10 +33,15 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /** A {@link ClusterClientFactory} for a standalone cluster, i.e. Flink on bare-metal. */
 @Internal
 public class StandaloneClientFactory implements ClusterClientFactory<StandaloneClusterId> {
+    private static final Logger LOG = LoggerFactory.getLogger(StandaloneClientFactory.class);
 
     @Override
     public boolean isCompatibleWith(Configuration configuration) {
         checkNotNull(configuration);
+        LOG.info(
+                "==> deploymentTarget, {} = {}",
+                DeploymentOptions.TARGET,
+                configuration.getString(DeploymentOptions.TARGET));
         return RemoteExecutor.NAME.equalsIgnoreCase(
                 configuration.getString(DeploymentOptions.TARGET));
     }

@@ -38,6 +38,8 @@ import org.apache.flink.yarn.configuration.YarnConfigOptions;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
@@ -50,6 +52,8 @@ import java.util.stream.Collectors;
 /** An {@link ApplicationClusterEntryPoint} for Yarn. */
 @Internal
 public final class YarnApplicationClusterEntryPoint extends ApplicationClusterEntryPoint {
+    private static final Logger LOG =
+            LoggerFactory.getLogger(YarnApplicationClusterEntryPoint.class);
 
     private YarnApplicationClusterEntryPoint(
             final Configuration configuration, final PackagedProgram program) {

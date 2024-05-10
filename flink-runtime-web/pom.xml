@@ -17,8 +17,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -36,8 +37,10 @@ under the License.
 
 	<properties>
 		<test.parameterProgram.name>parameter-program</test.parameterProgram.name>
-		<test.ParameterProgramNoManifest.name>parameter-program-without-manifest</test.ParameterProgramNoManifest.name>
-		<test.ParameterProgramWithEagerSink.name>parameter-program-with-eager-sink</test.ParameterProgramWithEagerSink.name>
+		<test.ParameterProgramNoManifest.name>parameter-program-without-manifest
+		</test.ParameterProgramNoManifest.name>
+		<test.ParameterProgramWithEagerSink.name>parameter-program-with-eager-sink
+		</test.ParameterProgramWithEagerSink.name>
 	</properties>
 
 	<dependencies>
@@ -166,11 +169,15 @@ under the License.
 						</goals>
 						<configuration>
 							<includes>
-								<include>org/apache/flink/runtime/webmonitor/handlers/utils/TestProgram.java</include>
+								<include>
+									org/apache/flink/runtime/webmonitor/handlers/utils/TestProgram.java
+								</include>
 							</includes>
 							<archive>
 								<manifest>
-									<mainClass>org.apache.flink.runtime.webmonitor.handlers.utils.TestProgram</mainClass>
+									<mainClass>
+										org.apache.flink.runtime.webmonitor.handlers.utils.TestProgram
+									</mainClass>
 								</manifest>
 							</archive>
 							<finalName>test-program</finalName>
@@ -185,11 +192,15 @@ under the License.
 						</goals>
 						<configuration>
 							<includes>
-								<include>org/apache/flink/runtime/webmonitor/handlers/utils/TestProgram.java</include>
+								<include>
+									org/apache/flink/runtime/webmonitor/handlers/utils/TestProgram.java
+								</include>
 							</includes>
 							<archive>
 								<manifest>
-									<mainClass>org.apache.flink.runtime.webmonitor.testutils.ParameterProgram</mainClass>
+									<mainClass>
+										org.apache.flink.runtime.webmonitor.testutils.ParameterProgram
+									</mainClass>
 								</manifest>
 							</archive>
 							<finalName>${test.parameterProgram.name}</finalName>
@@ -204,11 +215,15 @@ under the License.
 						</goals>
 						<configuration>
 							<includes>
-								<include>org/apache/flink/runtime/webmonitor/handlers/utils/EagerSinkProgram.java</include>
+								<include>
+									org/apache/flink/runtime/webmonitor/handlers/utils/EagerSinkProgram.java
+								</include>
 							</includes>
 							<archive>
 								<manifest>
-									<mainClass>org.apache.flink.runtime.webmonitor.handlers.utils.EagerSinkProgram</mainClass>
+									<mainClass>
+										org.apache.flink.runtime.webmonitor.handlers.utils.EagerSinkProgram
+									</mainClass>
 								</manifest>
 							</archive>
 							<finalName>${test.ParameterProgramWithEagerSink.name}</finalName>
@@ -223,7 +238,9 @@ under the License.
 						</goals>
 						<configuration>
 							<includes>
-								<include>org/apache/flink/runtime/webmonitor/handlers/utils/TestProgram.java</include>
+								<include>
+									org/apache/flink/runtime/webmonitor/handlers/utils/TestProgram.java
+								</include>
 							</includes>
 							<finalName>${test.ParameterProgramNoManifest.name}</finalName>
 						</configuration>
@@ -237,11 +254,15 @@ under the License.
 						</goals>
 						<configuration>
 							<includes>
-								<include>org/apache/flink/runtime/webmonitor/handlers/utils/OutputTestProgram.java</include>
+								<include>
+									org/apache/flink/runtime/webmonitor/handlers/utils/OutputTestProgram.java
+								</include>
 							</includes>
 							<archive>
 								<manifest>
-									<mainClass>org.apache.flink.runtime.webmonitor.handlers.utils.OutputTestProgram</mainClass>
+									<mainClass>
+										org.apache.flink.runtime.webmonitor.handlers.utils.OutputTestProgram
+									</mainClass>
 								</manifest>
 							</archive>
 							<finalName>output-test-program</finalName>
@@ -270,7 +291,7 @@ under the License.
 							<goal>npm</goal>
 						</goals>
 						<configuration>
-							<arguments>ci --cache-max=0 --no-save</arguments>
+							<arguments>install</arguments>
 							<environmentVariables>
 								<HUSKY_SKIP_INSTALL>true</HUSKY_SKIP_INSTALL>
 							</environmentVariables>
@@ -298,8 +319,10 @@ under the License.
 					<systemPropertyVariables>
 						<targetDir>${project.build.directory}</targetDir>
 						<parameterJarName>${test.parameterProgram.name}</parameterJarName>
-						<parameterJarWithoutManifestName>${test.ParameterProgramNoManifest.name}</parameterJarWithoutManifestName>
-						<parameterJarWithEagerSinkName>${test.ParameterProgramWithEagerSink.name}</parameterJarWithEagerSinkName>
+						<parameterJarWithoutManifestName>${test.ParameterProgramNoManifest.name}
+						</parameterJarWithoutManifestName>
+						<parameterJarWithEagerSinkName>${test.ParameterProgramWithEagerSink.name}
+						</parameterJarWithEagerSinkName>
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>

@@ -37,6 +37,9 @@ import org.apache.flink.runtime.resourcemanager.ResourceManagerFactory;
 import org.apache.flink.runtime.rest.JobRestEndpointFactory;
 import org.apache.flink.util.concurrent.ScheduledExecutor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,7 +55,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * {@code main()} method of the application is run on the cluster.
  */
 public class ApplicationClusterEntryPoint extends ClusterEntrypoint {
-
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationClusterEntryPoint.class);
     private final PackagedProgram program;
 
     private final ResourceManagerFactory<?> resourceManagerFactory;
@@ -70,6 +73,7 @@ public class ApplicationClusterEntryPoint extends ClusterEntrypoint {
     protected DispatcherResourceManagerComponentFactory
             createDispatcherResourceManagerComponentFactory(final Configuration configuration) {
         // TODO 创建DispatcherResourceManagerComponentFactory
+        LOG.info("==> createDispatcherResourceManagerComponentFactory");
         return new DefaultDispatcherResourceManagerComponentFactory(
                 new DefaultDispatcherRunnerFactory(
                         // TODO 创建ApplicationDispatcherLeaderProcessFactoryFactory
