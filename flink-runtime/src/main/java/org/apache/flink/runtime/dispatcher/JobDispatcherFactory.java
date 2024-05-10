@@ -52,7 +52,8 @@ public enum JobDispatcherFactory implements DispatcherFactory {
         return new MiniDispatcher(
                 rpcService,
                 fencingToken,
-                // TODO 创建DispatcherServices, DispatcherServices中包含了JobMasterServiceLeadershipRunnerFactor实例来创建JobManagerRunner
+                // TODO 创建DispatcherServices,
+                // DispatcherServices中包含了JobMasterServiceLeadershipRunnerFactor实例来创建JobManagerRunner
                 DispatcherServices.from(
                         partialDispatcherServicesWithJobGraphStore,
                         JobMasterServiceLeadershipRunnerFactory.INSTANCE),

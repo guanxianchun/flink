@@ -41,7 +41,8 @@ public enum SessionDispatcherFactory implements DispatcherFactory {
                 fencingToken,
                 recoveredJobs,
                 dispatcherBootstrapFactory,
-                // TODO 创建DispatcherServices, DispatcherServices中包含了JobMasterServiceLeadershipRunnerFactor实例来创建JobManagerRunner
+                // TODO 创建DispatcherServices,
+                // DispatcherServices中包含了JobMasterServiceLeadershipRunnerFactor实例来创建JobManagerRunner
                 DispatcherServices.from(
                         partialDispatcherServicesWithJobGraphStore,
                         JobMasterServiceLeadershipRunnerFactory.INSTANCE));

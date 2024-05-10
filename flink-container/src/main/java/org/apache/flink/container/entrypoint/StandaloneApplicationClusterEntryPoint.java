@@ -36,11 +36,16 @@ import org.apache.flink.runtime.util.JvmShutdownSafeguard;
 import org.apache.flink.runtime.util.SignalHandler;
 import org.apache.flink.util.FlinkException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 /** An {@link ApplicationClusterEntryPoint} which is started with a job in a predefined location. */
 @Internal
 public final class StandaloneApplicationClusterEntryPoint extends ApplicationClusterEntryPoint {
+    private static final Logger LOG =
+            LoggerFactory.getLogger(StandaloneApplicationClusterEntryPoint.class);
 
     private StandaloneApplicationClusterEntryPoint(
             final Configuration configuration, final PackagedProgram program) {
