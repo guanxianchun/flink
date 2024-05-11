@@ -229,7 +229,7 @@ public class JobMaster extends PermanentlyFencedRpcEndpoint<JobMasterId>
             throws Exception {
 
         super(rpcService, RpcServiceUtils.createRandomName(JOB_MANAGER_NAME), jobMasterId);
-
+        // 1. 创建运行部署状态管理处理器，当状态不匹配时会触发相应的动作
         final ExecutionDeploymentReconciliationHandler executionStateReconciliationHandler =
                 new ExecutionDeploymentReconciliationHandler() {
 
@@ -269,6 +269,7 @@ public class JobMaster extends PermanentlyFencedRpcEndpoint<JobMasterId>
                 };
 
         this.executionDeploymentTracker = executionDeploymentTracker;
+        // 2. 创建运行部署协调器
         this.executionDeploymentReconciler =
                 executionDeploymentReconcilerFactory.create(executionStateReconciliationHandler);
 
@@ -288,19 +289,20 @@ public class JobMaster extends PermanentlyFencedRpcEndpoint<JobMasterId>
                 jobMasterConfiguration
                         .getConfiguration()
                         .getBoolean(JobManagerOptions.RETRIEVE_TASK_MANAGER_HOSTNAME);
-
+        // 3. 从jobGraph中获取job名称和jobID
         final String jobName = jobGraph.getName();
         final JobID jid = jobGraph.getJobID();
 
         log.info("Initializing job '{}' ({}).", jobName, jid);
-
+        // 4. 获取资源管理器leader选举服务
         resourceManagerLeaderRetriever =
                 highAvailabilityServices.getResourceManagerLeaderRetriever();
-
+        // 5. 创建DeclarativeSlotPoolService工厂对象
         this.slotPoolService =
                 checkNotNull(slotPoolServiceSchedulerFactory).createSlotPoolService(jid);
 
         this.registeredTaskManagers = new HashMap<>(4);
+        // 6. 创建分区跟踪器
         this.partitionTracker =
                 checkNotNull(partitionTrackerFactory)
                         .create(
@@ -316,10 +318,11 @@ public class JobMaster extends PermanentlyFencedRpcEndpoint<JobMasterId>
                                 });
 
         this.shuffleMaster = checkNotNull(shuffleMaster);
-
+        // 7. 创建JobManager的作业指标组
         this.jobManagerJobMetricGroup = jobMetricGroupFactory.create(jobGraph);
+        // 8. 创建作业状态监听器
         this.jobStatusListener = new JobManagerJobStatusListener();
-        // TODO 创建Flink任务调度器
+        // 9. 创建Flink任务调度器， 与Checkpoint相关的逻辑在createScheduler方法流程中
         this.schedulerNG =
                 createScheduler(
                         slotPoolServiceSchedulerFactory,
@@ -328,6 +331,7 @@ public class JobMaster extends PermanentlyFencedRpcEndpoint<JobMasterId>
                         jobStatusListener);
 
         this.heartbeatServices = checkNotNull(heartbeatServices);
+        // 10. 创建TaskManager心跳管理器和resourceManager心跳管理器
         this.taskManagerHeartbeatManager = NoOpHeartbeatManager.getInstance();
         this.resourceManagerHeartbeatManager = NoOpHeartbeatManager.getInstance();
 

@@ -126,7 +126,7 @@ public class DefaultScheduler extends SchedulerBase implements SchedulerOperatio
             final ShuffleMaster<?> shuffleMaster,
             final Time rpcTimeout)
             throws Exception {
-
+        // 1. 调用父类的构造器
         super(
                 log,
                 jobGraph,
@@ -148,7 +148,7 @@ public class DefaultScheduler extends SchedulerBase implements SchedulerOperatio
         this.executionVertexOperations = checkNotNull(executionVertexOperations);
         this.shuffleMaster = checkNotNull(shuffleMaster);
         this.rpcTimeout = checkNotNull(rpcTimeout);
-
+        // 2. 创建故障恢复策略
         final FailoverStrategy failoverStrategy =
                 failoverStrategyFactory.create(
                         getSchedulingTopology(), getResultPartitionAvailabilityChecker());
@@ -160,12 +160,14 @@ public class DefaultScheduler extends SchedulerBase implements SchedulerOperatio
 
         enrichResourceProfile();
 
+        // 3. 创建失败处理器
         this.executionFailureHandler =
                 new ExecutionFailureHandler(
                         getSchedulingTopology(), failoverStrategy, restartBackoffTimeStrategy);
+        // 4. 创建运行调度策略
         this.schedulingStrategy =
                 schedulingStrategyFactory.createInstance(this, getSchedulingTopology());
-
+        // 5. 创建Slot分配器
         this.executionSlotAllocator =
                 checkNotNull(executionSlotAllocatorFactory)
                         .createInstance(new DefaultExecutionSlotAllocationContext());

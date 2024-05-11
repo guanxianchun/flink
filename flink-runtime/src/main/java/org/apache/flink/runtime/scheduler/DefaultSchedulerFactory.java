@@ -71,7 +71,7 @@ public class DefaultSchedulerFactory implements SchedulerNGFactory {
             final FatalErrorHandler fatalErrorHandler,
             final JobStatusListener jobStatusListener)
             throws Exception {
-
+        // 1. 将slotPoolService对象类型换成成SlotPool，如果转换失败，则抛出异常
         final SlotPool slotPool =
                 slotPoolService
                         .castInto(SlotPool.class)
@@ -79,7 +79,7 @@ public class DefaultSchedulerFactory implements SchedulerNGFactory {
                                 () ->
                                         new IllegalStateException(
                                                 "The DefaultScheduler requires a SlotPool."));
-
+        // 2. 创建Scheduler组件
         final DefaultSchedulerComponents schedulerComponents =
                 createSchedulerComponents(
                         jobGraph.getJobType(),
@@ -87,6 +87,7 @@ public class DefaultSchedulerFactory implements SchedulerNGFactory {
                         jobMasterConfiguration,
                         slotPool,
                         slotRequestTimeout);
+        // 3. 创建重启恢复策略,如：固定延迟重启策略、失败率重启策略、 无重启策略和全图恢复策略
         final RestartBackoffTimeStrategy restartBackoffTimeStrategy =
                 RestartBackoffTimeStrategyFactoryLoader.createRestartBackoffTimeStrategyFactory(
                                 jobGraph.getSerializedExecutionConfig()
@@ -100,7 +101,7 @@ public class DefaultSchedulerFactory implements SchedulerNGFactory {
                 restartBackoffTimeStrategy,
                 jobGraph.getName(),
                 jobGraph.getJobID());
-
+        // 4. 创建默认的运行拓扑图创建工厂
         final ExecutionGraphFactory executionGraphFactory =
                 new DefaultExecutionGraphFactory(
                         jobMasterConfiguration,
@@ -113,7 +114,7 @@ public class DefaultSchedulerFactory implements SchedulerNGFactory {
                         blobWriter,
                         shuffleMaster,
                         partitionTracker);
-        // TODO 创建默认的调度器
+        // 5. 创建默认的调度器
         return new DefaultScheduler(
                 log,
                 jobGraph,

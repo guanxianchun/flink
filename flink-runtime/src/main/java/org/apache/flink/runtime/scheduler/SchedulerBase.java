@@ -165,7 +165,7 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
             final JobStatusListener jobStatusListener,
             final ExecutionGraphFactory executionGraphFactory)
             throws Exception {
-
+        // 1. 属性初始化及检查
         this.log = checkNotNull(log);
         this.jobGraph = checkNotNull(jobGraph);
         this.executionGraphFactory = executionGraphFactory;
@@ -173,8 +173,9 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
         this.jobManagerJobMetricGroup = checkNotNull(jobManagerJobMetricGroup);
         this.executionVertexVersioner = checkNotNull(executionVertexVersioner);
         this.mainThreadExecutor = mainThreadExecutor;
-
+        // 2. 创建Checkpoint清理器，清理掉过期的Checkpoint
         this.checkpointsCleaner = new CheckpointsCleaner();
+        // 3. 创建CompletedCheckpointStore, 用于存储Checkpoint
         this.completedCheckpointStore =
                 SchedulerUtils.createCompletedCheckpointStoreIfCheckpointingIsEnabled(
                         jobGraph,
@@ -182,10 +183,11 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
                         userCodeLoader,
                         checkNotNull(checkpointRecoveryFactory),
                         log);
+        // 4. 创建CheckpointIDCounter, 用于生成CheckpointID
         this.checkpointIdCounter =
                 SchedulerUtils.createCheckpointIDCounterIfCheckpointingIsEnabled(
                         jobGraph, checkNotNull(checkpointRecoveryFactory));
-        // TODO 创建ExecutionGraph
+        // 6. 创建ExecutionGraph
         this.executionGraph =
                 createAndRestoreExecutionGraph(
                         completedCheckpointStore,
@@ -194,19 +196,21 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
                         initializationTimestamp,
                         mainThreadExecutor,
                         jobStatusListener);
-
+        // 7. 获取作业运行拓扑图的调度拓扑结构
         this.schedulingTopology = executionGraph.getSchedulingTopology();
-
+        // 8. 创建状态位置获取器
         stateLocationRetriever =
                 executionVertexId ->
                         getExecutionVertex(executionVertexId).getPreferredLocationBasedOnState();
+        // 9. 创建作业运行拓扑图的输入位置获取器
         inputsLocationsRetriever =
                 new ExecutionGraphToInputsLocationsRetrieverAdapter(executionGraph);
-
+        // 10. 创建KvStateHandler, 用于对KvState进行处理
         this.kvStateHandler = new KvStateHandler(executionGraph);
+        // 11. 创建ExecutionGraphHandler, 用于对ExecutionGraph进行操作
         this.executionGraphHandler =
                 new ExecutionGraphHandler(executionGraph, log, ioExecutor, this.mainThreadExecutor);
-        // TODO 创建OperatorCoordinatorHandler
+        // 12. 创建OperatorCoordinator处理器
         this.operatorCoordinatorHandler =
                 new DefaultOperatorCoordinatorHandler(executionGraph, this::handleGlobalFailure);
         operatorCoordinatorHandler.initializeOperatorCoordinators(this.mainThreadExecutor);
@@ -329,7 +333,7 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
             ComponentMainThreadExecutor mainThreadExecutor,
             JobStatusListener jobStatusListener)
             throws Exception {
-        // TODO 创建一个新的执行图
+        // 1. 创建一个新的作业运行拓扑图
         final ExecutionGraph newExecutionGraph =
                 executionGraphFactory.createAndRestoreExecutionGraph(
                         jobGraph,
@@ -342,10 +346,12 @@ public abstract class SchedulerBase implements SchedulerNG, CheckpointScheduling
                         new DefaultVertexAttemptNumberStore(),
                         computeVertexParallelismStore(jobGraph),
                         log);
-
+        // 2. 设置任务失败监听器
         newExecutionGraph.setInternalTaskFailuresListener(
                 new UpdateSchedulerNgOnInternalFailuresListener(this));
+        // 3. 注册作业状态监听器， 当作业状态变化时就会通知监听器
         newExecutionGraph.registerJobStatusListener(jobStatusListener);
+        // 4. 设置JobMaster运行的线程执行器
         newExecutionGraph.start(mainThreadExecutor);
 
         return newExecutionGraph;

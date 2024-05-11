@@ -102,7 +102,7 @@ public class DefaultExecutionGraphFactory implements ExecutionGraphFactory {
                         executionDeploymentTracker.stopTrackingDeploymentOf(execution);
                     }
                 };
-        // TODO 构建一个新的执行图
+        // 1. 构建作业运行拓扑图
         final ExecutionGraph newExecutionGraph =
                 DefaultExecutionGraphBuilder.buildGraph(
                         jobGraph,
@@ -125,16 +125,15 @@ public class DefaultExecutionGraphFactory implements ExecutionGraphFactory {
                         initializationTimestamp,
                         vertexAttemptNumberStore,
                         vertexParallelismStore);
-        // TODO 从执行图对象中获取checkpoint协调器
+        // 2. 从执行图对象中获取checkpoint协调器
         final CheckpointCoordinator checkpointCoordinator =
                 newExecutionGraph.getCheckpointCoordinator();
-
+        // 3. 如果存在checkpoint协调器，且存在有效的checkpoint，则从checkpoint中恢复
         if (checkpointCoordinator != null) {
-            // check whether we find a valid checkpoint
+            // 如果不存在有效的checkpoint(全图恢复)，则从savepoint中恢复
             if (!checkpointCoordinator.restoreInitialCheckpointIfPresent(
                     new HashSet<>(newExecutionGraph.getAllVertices().values()))) {
-
-                // check whether we can restore from a savepoint
+                // 尝试从savepoint中恢复
                 tryRestoreExecutionGraphFromSavepoint(
                         newExecutionGraph, jobGraph.getSavepointRestoreSettings());
             }

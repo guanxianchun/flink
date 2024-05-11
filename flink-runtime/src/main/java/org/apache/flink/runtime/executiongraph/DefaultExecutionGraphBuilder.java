@@ -117,7 +117,7 @@ public class DefaultExecutionGraphBuilder {
                 PartitionGroupReleaseStrategyFactoryLoader.loadPartitionGroupReleaseStrategyFactory(
                         jobManagerConfig);
 
-        // TODO 创建一个新的执行图
+        // 1. 创建作业运行拓扑图
         final DefaultExecutionGraph executionGraph;
         try {
             executionGraph =
@@ -145,7 +145,7 @@ public class DefaultExecutionGraphBuilder {
         // set the basic properties
 
         try {
-            // TODO 设置执行计划
+            //  2. 设置执行计划
             executionGraph.setJsonPlan(JsonPlanGenerator.generatePlan(jobGraph));
         } catch (Throwable t) {
             log.warn("Cannot create JSON plan for job", t);
@@ -153,9 +153,7 @@ public class DefaultExecutionGraphBuilder {
             executionGraph.setJsonPlan("{}");
         }
 
-        // initialize the vertices that have a master initialization hook
-        // file output formats create directories here, input formats create splits
-
+        // 3. 对MasterTriggerRestoreHook的初始化顶点，创建文件输出目录，输入创建splits
         final long initMasterStart = System.nanoTime();
         log.info("Running initialization on master for job {} ({}).", jobName, jobId);
 
@@ -185,7 +183,7 @@ public class DefaultExecutionGraphBuilder {
                 "Successfully ran initialization on master in {} ms.",
                 (System.nanoTime() - initMasterStart) / 1_000_000);
 
-        // topologically sort the job vertices and attach the graph to the existing one
+        // 对作业顶点进行拓扑排序，并将拓扑附加到现有的图上
         List<JobVertex> sortedTopology = jobGraph.getVerticesSortedTopologicallyFromSources();
         if (log.isDebugEnabled()) {
             log.debug(
@@ -201,11 +199,11 @@ public class DefaultExecutionGraphBuilder {
                     "Successfully created execution graph from job graph {} ({}).", jobName, jobId);
         }
 
-        // configure the state checkpointing
+        // 配置了checkpoint
         if (isCheckpointingEnabled(jobGraph)) {
             JobCheckpointingSettings snapshotSettings = jobGraph.getCheckpointingSettings();
 
-            // Maximum number of remembered checkpoints
+            // 保留状态检查点最大数量
             int historySize = jobManagerConfig.getInteger(WebOptions.CHECKPOINTS_HISTORY_SIZE);
 
             CheckpointStatsTracker checkpointStatsTracker =
@@ -214,7 +212,7 @@ public class DefaultExecutionGraphBuilder {
                             snapshotSettings.getCheckpointCoordinatorConfiguration(),
                             metrics);
 
-            // load the state backend from the application settings
+            // 根据配置加载状态后端
             final StateBackend applicationConfiguredBackend;
             final SerializedValue<StateBackend> serializedAppConfigured =
                     snapshotSettings.getDefaultStateBackend();
@@ -230,7 +228,7 @@ public class DefaultExecutionGraphBuilder {
                             jobId, "Could not deserialize application-defined state backend.", e);
                 }
             }
-
+            // 创建状态后端
             final StateBackend rootBackend;
             try {
                 rootBackend =
@@ -245,7 +243,7 @@ public class DefaultExecutionGraphBuilder {
                         jobId, "Could not instantiate configured state backend", e);
             }
 
-            // load the checkpoint storage from the application settings
+            // 加载checkpoint的存储
             final CheckpointStorage applicationConfiguredStorage;
             final SerializedValue<CheckpointStorage> serializedAppConfiguredStorage =
                     snapshotSettings.getDefaultCheckpointStorage();
@@ -279,8 +277,7 @@ public class DefaultExecutionGraphBuilder {
                         jobId, "Could not instantiate configured checkpoint storage", e);
             }
 
-            // instantiate the user-defined checkpoint hooks
-
+            // 实例化用户自义的checkpoint Hooks
             final SerializedValue<MasterTriggerRestoreHook.Factory[]> serializedHooks =
                     snapshotSettings.getMasterHooks();
             final List<MasterTriggerRestoreHook<?>> hooks;
@@ -309,10 +306,10 @@ public class DefaultExecutionGraphBuilder {
                     thread.setContextClassLoader(originalClassLoader);
                 }
             }
-
+            // 获取checkpoint配置
             final CheckpointCoordinatorConfiguration chkConfig =
                     snapshotSettings.getCheckpointCoordinatorConfiguration();
-            // TODO　==> 启动checkpoint, 创建CheckpointCoordinator，定时执行checkpoint
+            // 启动checkpoint, 创建CheckpointCoordinator，定时执行checkpoint
             executionGraph.enableCheckpointing(
                     chkConfig,
                     hooks,
@@ -324,8 +321,7 @@ public class DefaultExecutionGraphBuilder {
                     checkpointsCleaner);
         }
 
-        // create all the metrics for the Execution Graph
-
+        // 为作业运行拓扑图创建所有的metrics
         metrics.gauge(RestartTimeGauge.METRIC_NAME, new RestartTimeGauge(executionGraph));
         metrics.gauge(DownTimeGauge.METRIC_NAME, new DownTimeGauge(executionGraph));
         metrics.gauge(UpTimeGauge.METRIC_NAME, new UpTimeGauge(executionGraph));
