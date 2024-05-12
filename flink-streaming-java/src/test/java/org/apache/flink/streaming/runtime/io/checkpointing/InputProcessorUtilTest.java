@@ -68,7 +68,8 @@ public class InputProcessorUtilTest {
                         Collections.singletonList(getGate(1, 4)),
                         Collections.singletonList(getGate(0, 2)),
                     };
-
+            // TODO [checkpoint] 创建Checkpoint屏障处理器
+            // EXACTLY_ONCE -> SingleCheckpointBarrierHandler; AT_LEAST_ONCE -> CheckpointBarrierTracker
             CheckpointBarrierHandler barrierHandler =
                     InputProcessorUtil.createCheckpointBarrierHandler(
                             streamTask,
@@ -79,7 +80,7 @@ public class InputProcessorUtilTest {
                             Collections.emptyList(),
                             new SyncMailboxExecutor(),
                             new TestProcessingTimeService());
-
+            // TODO [checkpoint] 创建Checkpoint输入网关
             CheckpointedInputGate[] checkpointedMultipleInputGate =
                     InputProcessorUtil.createCheckpointedMultipleInputGate(
                             new SyncMailboxExecutor(),
@@ -87,7 +88,7 @@ public class InputProcessorUtilTest {
                             environment.getMetricGroup().getIOMetricGroup(),
                             barrierHandler,
                             streamConfig);
-
+            // TODO [checkpoint] 注册Checkpoint输入网关关闭
             for (CheckpointedInputGate checkpointedInputGate : checkpointedMultipleInputGate) {
                 registry.registerCloseable(checkpointedInputGate);
             }
@@ -100,6 +101,7 @@ public class InputProcessorUtilTest {
                 for (int channelId = 0;
                         channelId < inputGate.getNumberOfInputChannels();
                         channelId++) {
+                    // TODO [checkpoint] 注册Checkpoint输入网关关闭
                     barrierHandler.processBarrier(
                             new CheckpointBarrier(
                                     1,

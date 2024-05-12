@@ -834,6 +834,7 @@ public class Execution
      */
     public CompletableFuture<Acknowledge> triggerCheckpoint(
             long checkpointId, long timestamp, CheckpointOptions checkpointOptions) {
+        // TODO [checkpoint] 触发Checkpoint
         return triggerCheckpointHelper(checkpointId, timestamp, checkpointOptions);
     }
 
@@ -847,6 +848,7 @@ public class Execution
      */
     public CompletableFuture<Acknowledge> triggerSynchronousSavepoint(
             long checkpointId, long timestamp, CheckpointOptions checkpointOptions) {
+        // TODO [checkpoint] 触发Checkpoint
         return triggerCheckpointHelper(checkpointId, timestamp, checkpointOptions);
     }
 
@@ -864,7 +866,7 @@ public class Execution
 
         if (slot != null) {
             final TaskManagerGateway taskManagerGateway = slot.getTaskManagerGateway();
-
+            // TODO [checkpoint] 触发Checkpoint
             return taskManagerGateway.triggerCheckpoint(
                     attemptId, getVertex().getJobId(), checkpointId, timestamp, checkpointOptions);
         }

@@ -1324,6 +1324,7 @@ public class Task
         if (executionState == ExecutionState.RUNNING) {
             checkState(invokable instanceof CheckpointableTask, "invokable is not checkpointable");
             try {
+                // TODO [checkpoint] 触发Checkpoint
                 ((CheckpointableTask) invokable)
                         .triggerCheckpointAsync(checkpointMetaData, checkpointOptions)
                         .handle(

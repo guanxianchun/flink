@@ -84,6 +84,7 @@ public abstract class AbstractUdfStreamOperator<OUT, F extends Function>
     @Override
     public void snapshotState(StateSnapshotContext context) throws Exception {
         super.snapshotState(context);
+        // TODO [checkpoint] 1.对用户UDF函数做快照
         StreamingFunctionUtils.snapshotFunctionState(
                 context, getOperatorStateBackend(), userFunction);
     }

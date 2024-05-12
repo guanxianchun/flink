@@ -179,10 +179,12 @@ public class RegularOperatorChain<OUT, OP extends StreamOperator<OUT>>
             ChannelStateWriter.ChannelStateWriteResult channelStateWriteResult,
             CheckpointStreamFactory storage)
             throws Exception {
+        // TODO [checkpoint] 1. 对所有的算子做快照
         for (StreamOperatorWrapper<?, ?> operatorWrapper : getAllOperators(true)) {
             if (!operatorWrapper.isClosed()) {
                 operatorSnapshotsInProgress.put(
                         operatorWrapper.getStreamOperator().getOperatorID(),
+                        // 对算子做checkpoint快照
                         buildOperatorSnapshotFutures(
                                 checkpointMetaData,
                                 checkpointOptions,
@@ -202,9 +204,11 @@ public class RegularOperatorChain<OUT, OP extends StreamOperator<OUT>>
             ChannelStateWriter.ChannelStateWriteResult channelStateWriteResult,
             CheckpointStreamFactory storage)
             throws Exception {
+        // TODO [checkpoint] 1. 对算子op做快照
         OperatorSnapshotFutures snapshotInProgress =
                 checkpointStreamOperator(
                         op, checkpointMetaData, checkpointOptions, storage, isRunning);
+        // TODO [checkpoint] 2. 如果是主算子
         if (op == getMainOperator()) {
             snapshotInProgress.setInputChannelStateFuture(
                     channelStateWriteResult
@@ -212,6 +216,7 @@ public class RegularOperatorChain<OUT, OP extends StreamOperator<OUT>>
                             .thenApply(StateObjectCollection::new)
                             .thenApply(SnapshotResult::of));
         }
+        // TODO [checkpoint] 3. 是sink算子
         if (op == getTailOperator()) {
             snapshotInProgress.setResultSubpartitionStateFuture(
                     channelStateWriteResult
@@ -230,6 +235,7 @@ public class RegularOperatorChain<OUT, OP extends StreamOperator<OUT>>
             Supplier<Boolean> isRunning)
             throws Exception {
         try {
+            // TODO [checkpoint] 对当前的算子做快照
             return op.snapshotState(
                     checkpointMetaData.getCheckpointId(),
                     checkpointMetaData.getTimestamp(),

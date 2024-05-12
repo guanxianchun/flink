@@ -477,6 +477,7 @@ public class CheckpointCoordinator {
         final CompletableFuture<CompletedCheckpoint> resultFuture = new CompletableFuture<>();
         timer.execute(
                 () ->
+                        // TODO [checkpoint] 触发Checkpoint
                         triggerCheckpoint(checkpointProperties, targetLocation, false)
                                 .whenComplete(
                                         (completedCheckpoint, throwable) -> {
@@ -499,6 +500,7 @@ public class CheckpointCoordinator {
      * @return a future to the completed checkpoint.
      */
     public CompletableFuture<CompletedCheckpoint> triggerCheckpoint(boolean isPeriodic) {
+        // TODO [checkpoint] 触发Checkpoint
         return triggerCheckpoint(checkpointProperties, null, isPeriodic);
     }
 
@@ -517,6 +519,7 @@ public class CheckpointCoordinator {
 
         CheckpointTriggerRequest request =
                 new CheckpointTriggerRequest(props, externalSavepointLocation, isPeriodic);
+        // TODO [checkpoint] 触发Checkpoint
         chooseRequestToExecute(request).ifPresent(this::startTriggeringCheckpoint);
         return request.onCompletionPromise;
     }
@@ -538,6 +541,7 @@ public class CheckpointCoordinator {
 
             final CompletableFuture<PendingCheckpoint> pendingCheckpointCompletableFuture =
                     checkpointPlanFuture
+                            // TODO [checkpoint] 1. 初始化checkpoint配置，分配checkpointId, checkpoint存储地址
                             .thenApplyAsync(
                                     plan -> {
                                         try {
@@ -553,6 +557,7 @@ public class CheckpointCoordinator {
                                         }
                                     },
                                     executor)
+                            // TODO [checkpoint] 2. 创建等处理的checkpoint请求
                             .thenApplyAsync(
                                     (checkpointInfo) ->
                                             createPendingCheckpoint(
@@ -564,7 +569,7 @@ public class CheckpointCoordinator {
                                                     checkpointInfo.f1.checkpointStorageLocation,
                                                     request.getOnCompletionFuture()),
                                     timer);
-
+            // TODO [checkpoint] 3. 触发并确认所有协调器收到检查点
             final CompletableFuture<?> coordinatorCheckpointsComplete =
                     pendingCheckpointCompletableFuture.thenComposeAsync(
                             (pendingCheckpoint) ->
@@ -579,6 +584,8 @@ public class CheckpointCoordinator {
             // has completed.
             // This is to ensure the tasks are checkpointed after the OperatorCoordinators in case
             // ExternallyInducedSource is used.
+            // TODO [checkpoint] 4. 我们必须在协调器检查点完成后获取Master State Hook的快照。这是为了确保在使用ExternallyInducedSource的情况下，
+            // 任务在OperatorCoordinator之后被检查点。
             final CompletableFuture<?> masterStatesComplete =
                     coordinatorCheckpointsComplete.thenComposeAsync(
                             ignored -> {
@@ -593,7 +600,7 @@ public class CheckpointCoordinator {
                                 return snapshotMasterState(checkpoint);
                             },
                             timer);
-
+            // TODO [checkpoint] 5. 触发Checkpoint请求
             FutureUtils.assertNoException(
                     CompletableFuture.allOf(masterStatesComplete, coordinatorCheckpointsComplete)
                             .handleAsync(
@@ -614,6 +621,7 @@ public class CheckpointCoordinator {
                                                 onTriggerFailure(checkpoint, throwable);
                                             }
                                         } else {
+                                            // TODO [checkpoint] 触发Checkpoint请求
                                             triggerCheckpointRequest(
                                                     request, timestamp, checkpoint);
                                         }
@@ -647,6 +655,7 @@ public class CheckpointCoordinator {
                             CheckpointFailureReason.TRIGGER_CHECKPOINT_FAILURE,
                             checkpoint.getFailureCause()));
         } else {
+            // TODO [checkpoint] 触发Checkpoint
             triggerTasks(request, timestamp, checkpoint)
                     .exceptionally(
                             failure -> {
@@ -703,10 +712,12 @@ public class CheckpointCoordinator {
         List<CompletableFuture<Acknowledge>> acks = new ArrayList<>();
         for (Execution execution : checkpoint.getCheckpointPlan().getTasksToTrigger()) {
             if (request.props.isSynchronous()) {
+                // TODO [checkpoint] 触发Savepoint
                 acks.add(
                         execution.triggerSynchronousSavepoint(
                                 checkpointId, timestamp, checkpointOptions));
             } else {
+                // TODO [checkpoint] 触发Checkpoint
                 acks.add(execution.triggerCheckpoint(checkpointId, timestamp, checkpointOptions));
             }
         }
@@ -911,6 +922,7 @@ public class CheckpointCoordinator {
     }
 
     private void executeQueuedRequest() {
+        // TODO [checkpoint] 触发Checkpoint
         chooseQueuedRequestToExecute().ifPresent(this::startTriggeringCheckpoint);
     }
 

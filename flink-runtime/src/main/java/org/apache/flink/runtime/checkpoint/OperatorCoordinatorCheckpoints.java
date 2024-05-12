@@ -66,6 +66,7 @@ final class OperatorCoordinatorCheckpoints {
                 new ArrayList<>(coordinators.size());
 
         for (final OperatorCoordinatorCheckpointContext coordinator : coordinators) {
+            // 触发checkpoint
             final CompletableFuture<CoordinatorSnapshot> checkpointFuture =
                     triggerCoordinatorCheckpoint(coordinator, checkpointId);
             individualSnapshots.add(checkpointFuture);

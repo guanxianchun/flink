@@ -95,7 +95,7 @@ public final class StreamingFunctionUtils {
         Preconditions.checkNotNull(backend);
 
         while (true) {
-
+            // TODO [checkpoint] 1. 尝试对实现CheckpointedFunction或ListCheckpointed接口的Function对象调用其快照方法
             if (trySnapshotFunctionState(context, backend, userFunction)) {
                 break;
             }
@@ -113,13 +113,13 @@ public final class StreamingFunctionUtils {
     private static boolean trySnapshotFunctionState(
             StateSnapshotContext context, OperatorStateBackend backend, Function userFunction)
             throws Exception {
-
+        // TODO [checkpoint] 1. 如果用户函数实现了CheckpointedFunction接口，则调用其snapshotState方法
         if (userFunction instanceof CheckpointedFunction) {
             ((CheckpointedFunction) userFunction).snapshotState(context);
 
             return true;
         }
-
+        // TODO [checkpoint] 2. 如果用户函数实现了ListCheckpointed接口，则调用其snapshotState方法
         if (userFunction instanceof ListCheckpointed) {
             @SuppressWarnings("unchecked")
             List<Serializable> partitionableState =

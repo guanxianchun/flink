@@ -125,6 +125,7 @@ public class TaskExecutorGatewayDecoratorBase implements TaskExecutorGateway {
             long checkpointID,
             long checkpointTimestamp,
             CheckpointOptions checkpointOptions) {
+        // TODO [checkpoint] 触发Checkpoint
         return originalGateway.triggerCheckpoint(
                 executionAttemptID, checkpointID, checkpointTimestamp, checkpointOptions);
     }

@@ -289,6 +289,7 @@ public abstract class AbstractStreamOperatorV2<OUT>
             CheckpointOptions checkpointOptions,
             CheckpointStreamFactory factory)
             throws Exception {
+        // TODO [checkpoint] 1. 在当前算子上做快照
         return stateHandler.snapshotState(
                 this,
                 Optional.ofNullable(timeServiceManager),

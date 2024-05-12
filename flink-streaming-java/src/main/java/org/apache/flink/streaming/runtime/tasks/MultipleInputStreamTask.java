@@ -136,6 +136,8 @@ public class MultipleInputStreamTask<OUT>
             InputConfig[] inputs,
             WatermarkGauge[] inputWatermarkGauges,
             Function<Integer, StreamPartitioner<?>> gatePartitioners) {
+        // TODO [checkpoint] 创建Checkpoint屏障处理器
+        // EXACTLY_ONCE -> SingleCheckpointBarrierHandler; AT_LEAST_ONCE -> CheckpointBarrierTracker
         checkpointBarrierHandler =
                 InputProcessorUtil.createCheckpointBarrierHandler(
                         this,
@@ -146,7 +148,7 @@ public class MultipleInputStreamTask<OUT>
                         operatorChain.getSourceTaskInputs(),
                         mainMailboxExecutor,
                         timerService);
-
+        // TODO [checkpoint] 创建Checkpoint输入网关
         CheckpointedInputGate[] checkpointedInputGates =
                 InputProcessorUtil.createCheckpointedMultipleInputGate(
                         mainMailboxExecutor,
@@ -154,7 +156,7 @@ public class MultipleInputStreamTask<OUT>
                         getEnvironment().getMetricGroup().getIOMetricGroup(),
                         checkpointBarrierHandler,
                         configuration);
-
+        // 创建输入处理器
         inputProcessor =
                 StreamMultipleInputProcessorFactory.create(
                         this,
@@ -184,7 +186,7 @@ public class MultipleInputStreamTask<OUT>
     @Override
     public CompletableFuture<Boolean> triggerCheckpointAsync(
             CheckpointMetaData metadata, CheckpointOptions options) {
-
+        // TODO [checkpoint] 触发Checkpoint
         if (operatorChain.getSourceTaskInputs().size() == 0) {
             return super.triggerCheckpointAsync(metadata, options);
         }
@@ -195,9 +197,14 @@ public class MultipleInputStreamTask<OUT>
         // EndOfPartitionEvent, we would not complement barriers for the
         // unfinished network inputs, and the checkpoint would be triggered
         // after received all the EndOfPartitionEvent.
+        // 如果有链接源，我们总是只触发链接源的检查点。这意味着对于上游任务完成期间的检查点，
+        // 并且该任务接收到EndOfPartitionEvent，我们不会为未完成的网络输入补充屏障，
+        // 并且检查点将在接收到所有EndOfPartitionEvent之后触发。
         if (options.getCheckpointType().shouldDrain()) {
+            // TODO [checkpoint] 触发停止时做savepoint
             return triggerStopWithSavepointWithDrainAsync(metadata, options);
         } else {
+            // TODO [checkpoint] 触发源做Checkpoint
             return triggerSourcesCheckpointAsync(metadata, options);
         }
     }
@@ -217,6 +224,7 @@ public class MultipleInputStreamTask<OUT>
                         pendingCheckpointCompletedFutures.put(
                                 metadata.getCheckpointId(), resultFuture);
                         checkPendingCheckpointCompletedFuturesSize();
+                        // TODO [checkpoint] 为源发送Checkpoint屏障
                         emitBarrierForSources(
                                 new CheckpointBarrier(
                                         metadata.getCheckpointId(),
@@ -250,7 +258,7 @@ public class MultipleInputStreamTask<OUT>
                             sourcesStopped);
                 },
                 "stop chained Flip-27 source for stop-with-savepoint --drain");
-
+        // TODO [checkpoint] 为源发送Checkpoint屏障
         return assertTriggeringCheckpointExceptions(
                 sourcesStopped.thenCompose(
                         ignore ->
@@ -278,6 +286,7 @@ public class MultipleInputStreamTask<OUT>
     private void emitBarrierForSources(CheckpointBarrier checkpointBarrier) throws IOException {
         for (StreamTaskSourceInput<?> sourceInput : operatorChain.getSourceTaskInputs()) {
             for (InputChannelInfo channelInfo : sourceInput.getChannelInfos()) {
+                // TODO [checkpoint] 处理Checkpoint屏障
                 checkpointBarrierHandler.processBarrier(checkpointBarrier, channelInfo, false);
             }
         }
@@ -292,6 +301,7 @@ public class MultipleInputStreamTask<OUT>
         CompletableFuture<Boolean> resultFuture =
                 pendingCheckpointCompletedFutures.remove(checkpointMetaData.getCheckpointId());
         try {
+            // 触发快照执行
             super.triggerCheckpointOnBarrier(
                     checkpointMetaData, checkpointOptions, checkpointMetrics);
             if (resultFuture != null) {

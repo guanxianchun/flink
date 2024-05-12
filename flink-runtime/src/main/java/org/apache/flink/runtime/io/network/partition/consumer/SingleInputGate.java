@@ -795,11 +795,13 @@ public class SingleInputGate extends IndexedInputGate {
                     inputChannelsWithData.getAndRemove(channel -> channel == currentChannel);
                 }
             }
+            // 已经收到所有分区事件
             if (hasReceivedAllEndOfPartitionEvents) {
                 // Because of race condition between:
                 // 1. releasing inputChannelsWithData lock in this method and reaching this place
                 // 2. empty data notification that re-enqueues a channel we can end up with
                 // moreAvailable flag set to true, while we expect no more data.
+                //
                 checkState(!moreAvailable || !pollNext().isPresent());
                 moreAvailable = false;
                 markAvailable();

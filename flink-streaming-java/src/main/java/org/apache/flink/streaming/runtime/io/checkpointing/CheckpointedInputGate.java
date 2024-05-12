@@ -93,7 +93,7 @@ public class CheckpointedInputGate implements PullingAsyncDataInput<BufferOrEven
         this.barrierHandler = barrierHandler;
         this.mailboxExecutor = mailboxExecutor;
         this.upstreamRecoveryTracker = upstreamRecoveryTracker;
-
+        // TODO [checkpoint] 等待处理优先级事件
         waitForPriorityEvents(inputGate, mailboxExecutor);
     }
 
@@ -108,7 +108,7 @@ public class CheckpointedInputGate implements PullingAsyncDataInput<BufferOrEven
         // was being executed)
         boolean hasPriorityEvent = inputGate.getPriorityEventAvailableFuture().isDone();
         while (hasPriorityEvent) {
-            // process as many priority events as possible
+            // TODO [checkpoint] 处理优先级事件
             final Optional<BufferOrEvent> bufferOrEventOpt = pollNext();
             if (!bufferOrEventOpt.isPresent()) {
                 break;
@@ -119,6 +119,7 @@ public class CheckpointedInputGate implements PullingAsyncDataInput<BufferOrEven
         }
 
         // re-enqueue mail to process future priority events
+        // TODO [checkpoint] 重新排列处理优先级事件
         waitForPriorityEvents(inputGate, mailboxExecutor);
     }
 
@@ -129,6 +130,7 @@ public class CheckpointedInputGate implements PullingAsyncDataInput<BufferOrEven
                 priorityEventAvailableFuture.thenRun(
                         () -> {
                             try {
+                                // TODO [checkpoint] 处理优先级事件
                                 mailboxExecutor.execute(
                                         this::processPriorityEvents,
                                         "process priority event @ gate %s",
@@ -154,7 +156,7 @@ public class CheckpointedInputGate implements PullingAsyncDataInput<BufferOrEven
         }
 
         BufferOrEvent bufferOrEvent = next.get();
-
+        // TODO 事件处理
         if (bufferOrEvent.isEvent()) {
             return handleEvent(bufferOrEvent);
         } else if (bufferOrEvent.isBuffer()) {
@@ -176,10 +178,12 @@ public class CheckpointedInputGate implements PullingAsyncDataInput<BufferOrEven
 
     private Optional<BufferOrEvent> handleEvent(BufferOrEvent bufferOrEvent) throws IOException {
         Class<? extends AbstractEvent> eventClass = bufferOrEvent.getEvent().getClass();
+        // 如果是checkpoint事件，则执行快照
         if (eventClass == CheckpointBarrier.class) {
             CheckpointBarrier checkpointBarrier = (CheckpointBarrier) bufferOrEvent.getEvent();
             barrierHandler.processBarrier(checkpointBarrier, bufferOrEvent.getChannelInfo(), false);
         } else if (eventClass == CancelCheckpointMarker.class) {
+            // 如果是取消checkpoint事件，则取消checkpoint
             barrierHandler.processCancellationBarrier(
                     (CancelCheckpointMarker) bufferOrEvent.getEvent(),
                     bufferOrEvent.getChannelInfo());

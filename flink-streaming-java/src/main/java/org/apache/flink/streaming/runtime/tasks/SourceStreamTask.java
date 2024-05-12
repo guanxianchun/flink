@@ -259,9 +259,11 @@ public class SourceStreamTask<
             CheckpointMetaData checkpointMetaData, CheckpointOptions checkpointOptions) {
         if (!externallyInducedCheckpoints) {
             if (checkpointOptions.getCheckpointType().shouldDrain()) {
+                // 1. 停止做savepoint
                 return triggerStopWithSavepointWithDrainAsync(
                         checkpointMetaData, checkpointOptions);
             } else {
+                // 2. 调用父类的triggerCheckpointAsync
                 return super.triggerCheckpointAsync(checkpointMetaData, checkpointOptions);
             }
         } else {

@@ -166,7 +166,7 @@ public class StreamOperatorStateHandler {
         StateSnapshotContextSynchronousImpl snapshotContext =
                 new StateSnapshotContextSynchronousImpl(
                         checkpointId, timestamp, factory, keyGroupRange, closeableRegistry);
-
+        // TODO [checkpoint] 1. 对算子做快照
         snapshotState(
                 streamOperator,
                 timeServiceManager,
@@ -216,6 +216,7 @@ public class StreamOperatorStateHandler {
                             snapshotContext.getRawKeyedOperatorStateOutput(), operatorName);
                 }
             }
+            // TODO [checkpoint] 1. 对流算子做快照
             streamOperator.snapshotState(snapshotContext);
 
             snapshotInProgress.setKeyedStateRawFuture(snapshotContext.getKeyedStateStreamFuture());

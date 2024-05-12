@@ -292,14 +292,17 @@ class SubtaskCheckpointCoordinatorImpl implements SubtaskCheckpointCoordinator {
 
         // Step (1): Prepare the checkpoint, allow operators to do some pre-barrier work.
         //           The pre-barrier work should be nothing or minimal in the common case.
+        // TODO [checkpoint] 1. Checkpoint前的准备工作，允许算子做一些屏障前的工作
         operatorChain.prepareSnapshotPreBarrier(metadata.getCheckpointId());
 
         // Step (2): Send the checkpoint barrier downstream
+        // TODO [checkpoint] 2. 向下游流发送checkpoint屏障
         operatorChain.broadcastEvent(
                 new CheckpointBarrier(metadata.getCheckpointId(), metadata.getTimestamp(), options),
                 options.isUnalignedCheckpoint());
 
         // Step (3): Prepare to spill the in-flight buffers for input and output
+        // TODO [checkpoint] 3. 准备好checkpoint的输入和输出的缓冲区(非对齐模式下)
         if (options.isUnalignedCheckpoint()) {
             // output data already written while broadcasting event
             channelStateWriter.finishOutput(metadata.getCheckpointId());
@@ -308,10 +311,11 @@ class SubtaskCheckpointCoordinatorImpl implements SubtaskCheckpointCoordinator {
         // Step (4): Take the state snapshot. This should be largely asynchronous, to not impact
         // progress of the
         // streaming topology
-
+        // TODO [checkpoint] 4. 对状态做checkpoint快照
         Map<OperatorID, OperatorSnapshotFutures> snapshotFutures =
                 new HashMap<>(operatorChain.getNumberOfOperators());
         try {
+            // TODO [checkpoint] 对算子链做snapshot
             if (takeSnapshotSync(
                     snapshotFutures, metadata, metrics, options, operatorChain, isRunning)) {
                 finishAndReportAsync(
@@ -322,6 +326,7 @@ class SubtaskCheckpointCoordinatorImpl implements SubtaskCheckpointCoordinator {
                         isOperatorsFinished,
                         isRunning);
             } else {
+                // TODO [checkpoint] 失败了则做一些清理工作
                 cleanup(snapshotFutures, metadata, metrics, new Exception("Checkpoint declined"));
             }
         } catch (Exception ex) {
@@ -602,6 +607,7 @@ class SubtaskCheckpointCoordinatorImpl implements SubtaskCheckpointCoordinator {
                         checkpointId, checkpointOptions.getTargetLocation());
 
         try {
+            // TODO [checkpoint] 对算子链上的所有算子做快照
             operatorChain.snapshotState(
                     operatorSnapshotsInProgress,
                     checkpointMetaData,

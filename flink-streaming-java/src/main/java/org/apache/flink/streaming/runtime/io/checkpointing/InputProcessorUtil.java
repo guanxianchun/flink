@@ -70,6 +70,7 @@ public class InputProcessorUtil {
         return Arrays.stream(unionedInputGates)
                 .map(
                         unionedInputGate ->
+                                // TODO [checkpoint] 创建checkpoint输入网关，并启动等待处理checkpoint的优先级事件
                                 new CheckpointedInputGate(
                                         unionedInputGate,
                                         barrierHandler,

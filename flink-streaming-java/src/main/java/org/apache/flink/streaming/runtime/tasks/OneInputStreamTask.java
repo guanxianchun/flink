@@ -155,7 +155,8 @@ public class OneInputStreamTask<IN, OUT> extends StreamTask<OUT, OneInputStreamO
     @SuppressWarnings("unchecked")
     private CheckpointedInputGate createCheckpointedInputGate() {
         IndexedInputGate[] inputGates = getEnvironment().getAllInputGates();
-
+        // TODO [checkpoint] 创建Checkpoint屏障处理器
+        // EXACTLY_ONCE -> SingleCheckpointBarrierHandler; AT_LEAST_ONCE -> CheckpointBarrierTracker
         checkpointBarrierHandler =
                 InputProcessorUtil.createCheckpointBarrierHandler(
                         this,
@@ -166,7 +167,7 @@ public class OneInputStreamTask<IN, OUT> extends StreamTask<OUT, OneInputStreamO
                         Collections.emptyList(),
                         mainMailboxExecutor,
                         systemTimerService);
-
+        // TODO [checkpoint] 创建Checkpoint输入网关
         CheckpointedInputGate[] checkpointedInputGates =
                 InputProcessorUtil.createCheckpointedMultipleInputGate(
                         mainMailboxExecutor,

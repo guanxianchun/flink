@@ -1119,10 +1119,12 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>>
 
                         if (noUnfinishedInputGates) {
                             result.complete(
+                                    // TODO [checkpoint] 触发Checkpoint
                                     triggerCheckpointAsyncInMailbox(
                                             checkpointMetaData, checkpointOptions));
                         } else {
                             result.complete(
+                                    // TODO [checkpoint] 触发Checkpoint
                                     triggerUnfinishedChannelsCheckpoint(
                                             checkpointMetaData, checkpointOptions));
                         }
@@ -1149,16 +1151,16 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>>
                                     0,
                                     System.currentTimeMillis() - checkpointMetaData.getTimestamp());
 
-            // No alignment if we inject a checkpoint
+            // TODO [checkpoint] 1. 构建Checkpoint的metrics
             CheckpointMetricsBuilder checkpointMetrics =
                     new CheckpointMetricsBuilder()
                             .setAlignmentDurationNanos(0L)
                             .setBytesProcessedDuringAlignment(0L)
                             .setCheckpointStartDelayNanos(latestAsyncCheckpointStartDelayNanos);
-
+            // TODO [checkpoint] 2. 非对齐checkpoint的初始化工作
             subtaskCheckpointCoordinator.initInputsCheckpoint(
                     checkpointMetaData.getCheckpointId(), checkpointOptions);
-
+            // TODO [checkpoint] 3. 执行快照
             boolean success =
                     performCheckpoint(checkpointMetaData, checkpointOptions, checkpointMetrics);
             if (!success) {
@@ -1255,6 +1257,7 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>>
 
         FlinkSecurityManager.monitorUserSystemExitForCurrentThread();
         try {
+            // 执行快照
             if (performCheckpoint(checkpointMetaData, checkpointOptions, checkpointMetrics)) {
                 if (isCurrentSavepointWithoutDrain(checkpointMetaData.getCheckpointId())) {
                     runSynchronousSavepointMailboxLoop();
@@ -1325,7 +1328,7 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>>
                                 && this.finalCheckpointMinId == null) {
                             this.finalCheckpointMinId = checkpointMetaData.getCheckpointId();
                         }
-
+                        // TODO [checkpoint] 执行快照
                         subtaskCheckpointCoordinator.checkpointState(
                                 checkpointMetaData,
                                 checkpointOptions,

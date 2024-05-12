@@ -400,12 +400,12 @@ public class DefaultExecutionGraph implements ExecutionGraph, InternalExecutionG
 
         checkState(state == JobStatus.CREATED, "Job must be in CREATED state");
         checkState(checkpointCoordinator == null, "checkpointing already enabled");
-
+        // 1. 创建CheckpointCoordinator算子上下文
         final Collection<OperatorCoordinatorCheckpointContext> operatorCoordinators =
                 buildOpCoordinatorCheckpointContexts();
 
         checkpointStatsTracker = checkNotNull(statsTracker, "CheckpointStatsTracker");
-
+        // 2. 创建checkpoint失败管理器
         CheckpointFailureManager failureManager =
                 new CheckpointFailureManager(
                         chkConfig.getTolerableCheckpointFailureNumber(),
@@ -427,13 +427,13 @@ public class DefaultExecutionGraph implements ExecutionGraph, InternalExecutionG
                         });
 
         checkState(checkpointCoordinatorTimer == null);
-        // TODO 创建定时器
+        // 3. 创建CheckpointCoordinator的定时器，用于定时执行Checkpoint
         checkpointCoordinatorTimer =
                 Executors.newSingleThreadScheduledExecutor(
                         new DispatcherThreadFactory(
                                 Thread.currentThread().getThreadGroup(), "Checkpoint Timer"));
 
-        // TODO 创建触发和提交checkpoint的协调器
+        // 4. 创建触发和提交checkpoint的协调器
         checkpointCoordinator =
                 new CheckpointCoordinator(
                         jobInformation.getJobId(),
@@ -451,7 +451,7 @@ public class DefaultExecutionGraph implements ExecutionGraph, InternalExecutionG
                                 chkConfig.isEnableCheckpointsAfterTasksFinish()),
                         new ExecutionAttemptMappingProvider(getAllExecutionVertices()));
 
-        // register the master hooks on the checkpoint coordinator
+        // 5. 在checkpoint协调器注册Master hooks
         for (MasterTriggerRestoreHook<?> hook : masterHooks) {
             if (!checkpointCoordinator.addMasterHook(hook)) {
                 LOG.warn(
@@ -459,12 +459,13 @@ public class DefaultExecutionGraph implements ExecutionGraph, InternalExecutionG
                         hook.getIdentifier());
             }
         }
-
+        // 6. 设置Checkpoint状态跟踪器
         checkpointCoordinator.setCheckpointStatsTracker(checkpointStatsTracker);
-        // TODO 注册任务状态监听器，当任务running -> 启动checkpoint调度程序， 其他状态时 -> 停止checkpoint定时调度程序
+        // 7. 周期性执行Checkpoint
         if (checkpointCoordinator.isPeriodicCheckpointingConfigured()) {
-            // the periodic checkpoint scheduler is activated and deactivated as a result of
-            // job status changes (running -> on, all other states -> off)
+            // 注册任务状态监听器
+            // 当任务running -> 启动checkpoint调度程序， 其他状态时 -> 停止checkpoint定时调度程序
+            // createActivatorDeactivator方法创建CheckpointCoordinatorDeActivator对象
             registerJobStatusListener(checkpointCoordinator.createActivatorDeactivator());
         }
 
